@@ -143,6 +143,10 @@ def build(output: Path, input_path: Path | None = None, manifest_path: Path | No
                                 'Participant review and pilot evidence must be established separately from supplied main records.')
         source = source.replace('Participant review, empirical data, actual analysis, and final conclusions are outstanding.',
                                 'Supplied data are processed in this edition; external validation, methodological review, and final empirical conclusions remain researcher responsibilities.')
+        source = source.replace('External review, genuine data, real-data analysis, and final empirical conclusions remain pending.',
+                                'Supplied records have been processed; external validation, methodological review, and final empirical conclusions remain pending.')
+        source = source.replace('## 5.4 Evidence-based discussion procedure — pending data',
+                                '## 5.4 Evidence-based discussion procedure — pending interpretation')
     source += '\n\n' + dictionary_markdown()
     page = render(source, imported, synthetic_check)
     output.parent.mkdir(parents=True, exist_ok=True)

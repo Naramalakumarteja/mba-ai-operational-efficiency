@@ -4,6 +4,8 @@ The research-design edition has a five-chapter academic narrative: a pre-data ab
 
 Appendix A contains the internally reviewed v0.3 questionnaire. Appendix B is generated from the actual import schema. Recruitment/review/protocol documents distinguish required fields, optional context, planned participant activity, and implemented analysis. The existing pipeline supports coded CSV/JSON, eligibility and chronological deduplication, route-aware missingness, item summaries, diagnostic alpha, conditional Spearman/permutation/Holm outputs, private audit files, and reproducible offline reports. Synthetic checks are isolated and labelled; they cannot enter the ordinary research report. These are implementation and internal-review achievements, not evidence of external validation or collection.
 
+[SUBMISSION_HANDOFF.md](SUBMISSION_HANDOFF.md) gives the supervisor-facing release workflow. [data/README.md](data/README.md) and the bundled header-only CSV/dictionary provide the exact response format without any respondent records. Original exports and computed data remain ignored; genuine coded input belongs under `private/`.
+
 ## 2. REQUIRES EXTERNAL INPUT
 
 - **Actual institutional and participant-information requirements:** handbook/template/rubric, student/institution/supervisor/contact details, required permissions and consent arrangements, retention/withdrawal procedure, and deadline. Place truthful materials under `private/requirements/`; no institution rules or approvals are assumed.

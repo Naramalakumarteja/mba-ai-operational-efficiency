@@ -8,7 +8,8 @@ import tempfile
 import unittest
 
 from research_pipeline import (REQUIRED, ITEMS, checksum, clean_records, read_records,
-                               analyse, spearman, ranks, holm, permutation_p, run)
+                               analyse, spearman, ranks, holm, permutation_p, run,
+                               dictionary_markdown)
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -28,6 +29,37 @@ def fixture(index=0):
 
 
 class PipelineTests(unittest.TestCase):
+    def test_submission_template_is_header_only_and_dictionary_is_current(self):
+        template = ROOT/'data/templates/responses.csv'
+        with template.open(encoding='utf-8-sig', newline='') as handle:
+            self.assertEqual(list(csv.reader(handle)), [REQUIRED])
+        self.assertEqual((ROOT/'data/templates/DATA_DICTIONARY.md').read_text(encoding='utf-8'),
+                         dictionary_markdown())
+        with self.assertRaisesRegex(ValueError, 'at least one'):
+            read_records(template)
+
+    def test_data_ignore_rules_keep_response_files_private(self):
+        public = ['data/README.md', 'data/raw/README.md', 'data/processed/README.md',
+                  'data/templates/responses.csv', 'data/templates/DATA_DICTIONARY.md']
+        confidential = ['data/raw/export.csv', 'data/raw/nested/export.xlsx',
+                        'data/processed/analysis.json', 'data/templates/populated.csv',
+                        'data/responses.csv', 'private/responses.csv', 'private/study.json']
+        result = subprocess.run(['git', 'check-ignore', '--no-index', '--stdin', '-z'], cwd=ROOT,
+                                input=('\0'.join(public + confidential) + '\0').encode('utf-8'),
+                                capture_output=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(set(result.stdout.decode('utf-8').rstrip('\0').split('\0')), set(confidential))
+
+    def test_malformed_quoted_csv_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory)/'malformed.csv'
+            valid_values = [fixture()[field] for field in REQUIRED[:-1]]
+            for text in ('"unterminated header',
+                         ','.join(REQUIRED) + '\n' + ','.join(valid_values) + ',"1'):
+                path.write_text(text, encoding='utf-8')
+                with self.subTest(text=text[:30]), self.assertRaisesRegex(ValueError, 'Malformed CSV'):
+                    read_records(path)
+
     @classmethod
     def setUpClass(cls):
         # A fresh checkout has no ignored scratch directory.
@@ -240,6 +272,9 @@ class PipelineTests(unittest.TestCase):
             self.assertIn('Figure 4.1. Reported AI-use frequency', page)
             self.assertNotIn('No genuine respondent data are available in this edition', page)
             self.assertNotIn('No participant dataset is present', page)
+            self.assertNotIn('genuine data, real-data analysis, and final empirical conclusions remain pending', page)
+            self.assertNotIn('5.4 Evidence-based discussion procedure — pending data', page)
+            self.assertIn('5.4 Evidence-based discussion procedure — pending interpretation', page)
             with self.assertRaisesRegex(ValueError, 'synthetic checks require work'):
                 build(ROOT/'outputs/not-research.html', source, manifest, synthetic_check=True)
 

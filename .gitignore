@@ -1,7 +1,19 @@
 # Local analysis and participant material must never be published.
 work/
 private/
-data/
+# Only public instructions and empty schema templates may be tracked under data/.
+/data/*
+!/data/README.md
+!/data/raw/
+/data/raw/*
+!/data/raw/README.md
+!/data/processed/
+/data/processed/*
+!/data/processed/README.md
+!/data/templates/
+/data/templates/*
+!/data/templates/responses.csv
+!/data/templates/DATA_DICTIONARY.md
 responses/
 .env
 .env.*

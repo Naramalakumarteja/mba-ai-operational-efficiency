@@ -20,6 +20,7 @@ The project examines whether reported operational AI use is associated with perc
 - Missing-reason audit, item distributions/medians, diagnostic internal consistency, and an adoption SVG chart.
 - Conditional Spearman/permutation-test and Holm framework, gated by measurement support and independent-unit rationale.
 - Genuine-evidence report integration; synthetic inputs are rejected from the research report.
+- Header-only response template, authoritative import dictionary, and supervisor handoff.
 
 ## Technology and architecture
 
@@ -75,6 +76,7 @@ build_report.py                   Report builder and source validation
 research_pipeline.py              Import, validation, cleaning, analysis, SVG/tables
 SUBMISSION_BLOCKERS.md             Exact external evidence and requirements needed
 FINAL_SUBMISSION_STATUS.md         Completed academic package and post-data procedure
+SUBMISSION_HANDOFF.md              One-page supervisor/evaluator handoff
 requirements.txt                  Single pinned rendering dependency
 tests/test_report.py              Critical automated checks
 tests/test_pipeline.py            Isolated synthetic software tests
@@ -83,6 +85,12 @@ outputs/
   MBA_Draft_Questionnaire.md       Canonical questionnaire source
   MBA_Project_Report.html         Generated offline report, ignored by Git
   other .md files                 Existing research support documents
+data/
+  README.md                       Exact input/validation/regeneration instructions
+  raw/README.md                   Original-export storage instructions
+  processed/README.md             Analysis-output storage instructions
+  templates/responses.csv         Empty response header; no respondent rows
+  templates/DATA_DICTIONARY.md     Authoritative field codes and missing-value rules
 work/                             Ignored scratch area
 private/                          Ignored genuine input and analysis output
 ```
@@ -91,7 +99,7 @@ The historical main-report filename is retained to preserve existing links. It n
 
 ## Privacy and GitHub delivery
 
-Commit only report sources, code, tests, and documentation. Participant responses, contact details, code linkages, credentials, and exports belong outside this repository or in ignored local `private/`, `data/`, or `responses/` folders. Ignore rules reduce accidents but do not replace staged-diff review. Generated HTML is rebuilt locally.
+Commit only report sources, code, tests, documentation, and the empty response template. Participant responses, contact details, code linkages, credentials, and exports belong outside this repository or in ignored local `private/`, `data/raw/`, `data/processed/`, or `responses/` folders. Only the five instruction/template files listed under `data/` are allowed by Git. Never add responses to the tracked template; create the genuine coded copy under `private/`. Ignore rules reduce accidents but do not replace staged-diff review. Generated HTML is rebuilt locally.
 
 The configured GitHub repository is private: [mba-ai-operational-efficiency-chennai](https://github.com/Naramalakumarteja/mba-ai-operational-efficiency-chennai). Access and collaborator permissions are managed through GitHub.
 
@@ -101,7 +109,7 @@ The unknown institution requirements, respondent access, external questionnaire 
 
 ## Add genuine questionnaire responses and rerun
 
-Appendix B of the generated report is the complete import data dictionary. Questionnaire text is in Appendix A. Create an **empty** header-only template (no generated responses):
+Appendix B of the generated report is the complete import data dictionary, also available in [data/templates/DATA_DICTIONARY.md](data/templates/DATA_DICTIONARY.md). Questionnaire text is in Appendix A. [data/README.md](data/README.md) explains every input rule; [SUBMISSION_HANDOFF.md](SUBMISSION_HANDOFF.md) gives the submission workflow and remaining external inputs. The bundled [responses.csv](data/templates/responses.csv) has no response rows. Create a new **empty** header-only private template (no generated responses):
 
 ```sh
 python research_pipeline.py --template private/responses.csv

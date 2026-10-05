@@ -48,10 +48,10 @@ def read_records(path):
     path = Path(path)
     if path.suffix.lower() == '.csv':
         with path.open(encoding='utf-8-sig', newline='') as handle:
-            reader = csv.DictReader(handle)
-            if not reader.fieldnames or len(set(reader.fieldnames)) != len(reader.fieldnames):
-                raise ValueError('CSV needs unique column headings.')
+            reader = csv.DictReader(handle, strict=True)
             try:
+                if not reader.fieldnames or len(set(reader.fieldnames)) != len(reader.fieldnames):
+                    raise ValueError('CSV needs unique column headings.')
                 rows = list(reader)
             except csv.Error as exc:
                 raise ValueError('Malformed CSV; use a correctly escaped UTF-8 export.') from exc
