@@ -49,6 +49,27 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(cleaned[0]['missing_reasons']['P01'], 'not_known')
         self.assertEqual(cleaned[0]['missing_reasons']['P02'], 'not_applicable')
 
+    def test_skipped_routing_answers_preserve_eligible_outcomes(self):
+        row = fixture()
+        row.update(A01='Prefer not to answer', B06='', A02='invalid skipped code',
+                   K01='invalid skipped code')
+        cleaned, audit = clean_records([row])
+        self.assertEqual(len(cleaned), 1)
+        self.assertEqual(cleaned[0]['P01'], 1)
+        self.assertIsNone(cleaned[0]['A02'])
+        self.assertIsNone(cleaned[0]['K01'])
+        self.assertEqual(cleaned[0]['missing_reasons']['A01'], 'declined')
+        self.assertEqual(cleaned[0]['missing_reasons']['B06'], 'omitted')
+        self.assertEqual(cleaned[0]['missing_reasons']['K01'], 'skipped_by_design')
+        self.assertIn('K01_removed_by_cost_route', audit[0]['reasons'])
+
+    def test_unknown_ai_route_precedes_numeric_validation(self):
+        row = fixture()
+        row.update(S07='unknown ai status', A02='invalid skipped code')
+        cleaned, _ = clean_records([row])
+        self.assertEqual(len(cleaned), 1)
+        self.assertIsNone(cleaned[0]['A02'])
+
     def test_adoption_contradiction_does_not_become_zero(self):
         row = fixture()
         row.update(A01='no')
@@ -215,6 +236,9 @@ class PipelineTests(unittest.TestCase):
             self.assertIn('NOT RESEARCH FINDINGS', page)
             self.assertIn('data:image/svg+xml;base64,', page)
             self.assertIn('Appendix B: Data Dictionary', page)
+            self.assertIn('Table 4.1. Outcome-item summaries', page)
+            self.assertIn('Figure 4.1. Reported AI-use frequency', page)
+            self.assertNotIn('No genuine respondent data are available in this edition', page)
             self.assertNotIn('No participant dataset is present', page)
             with self.assertRaisesRegex(ValueError, 'synthetic checks require work'):
                 build(ROOT/'outputs/not-research.html', source, manifest, synthetic_check=True)

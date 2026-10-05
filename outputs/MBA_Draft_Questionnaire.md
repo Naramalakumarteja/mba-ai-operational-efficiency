@@ -34,7 +34,7 @@ S05. Have you worked in this unit for at least six months? Yes / No. If No, end.
 
 S06. Has this unit operated throughout the preceding six months? Yes / No / Unsure. No or Unsure: end or eligibility review, respectively.
 
-S07. Can you report on the unit's operational work and whether AI is used? Yes / I can report operations but do not know its AI status / No. No: end. Unknown AI status: outcome descriptions only, no adoption-association analysis.
+S07. Can you report on the unit's operational work and whether AI is used? Yes / I can report operations but do not know its AI status / No. No: end. Unknown AI status: answer unit context and applicable outcomes, skip the AI-use profile, and keep adoption unclassified for association analysis.
 
 ## B. Unit context
 
@@ -60,7 +60,7 @@ A03. Across the whole preceding six months, approximately what proportion of com
 
 A04. Which best describes the unit's usual AI integration across that period? No operational AI use / Isolated discretionary use / Used in selected recurring workflows / Embedded in most relevant recurring workflows / Changed too much to identify a usual level / Not known. These categories describe integration, not product sophistication. A changing level is not an ordinal score.
 
-For A01 = No, verify A02 = Never, A03 = None, A04 = No operational AI use; skip A05–A08. For A01 = Not known, retain adoption fields as unknown and skip A05–A08. Contradictions require review, not silent recoding.
+For A01 = No, verify A02 = Never, A03 = None, A04 = No operational AI use; skip A05–A08. For A01 = Not known or an omitted/declined A01 answer, keep adoption unclassified and skip A02–A08; continue applicable outcomes. Contradictions require review, not silent zero recoding. An omitted/declined B06 answer does not establish cost knowledge: skip the cost domain and preserve the omission/decline reason.
 
 A05. What applications were used? Select all: Response drafting or summarisation / Document classification or extraction / Workload forecasting / Scheduling or routing recommendations / Quality or exception detection / Other: describe / Not known.
 
@@ -120,13 +120,17 @@ X03. Describe one operational benefit, difficulty, or unchanged outcome you cons
 
 ## Researcher coding and scoring specification
 
+Table A.1 describes analysis coding. Participant response labels must be mapped explicitly to the import codes in Appendix B; no automatic label mapping is performed.
+
+**Table A.1. Questionnaire coding and analytical use**
+
 | Fields | Coding/use |
 |---|---|
 | C01; S01–S07 | Eligibility and branching; preserve raw answers |
 | B01–B03 | Context; categorical variables, not equal-interval numbers |
 | B04–B05 | Coded organisation and unit identifiers; check duplicates/clustering |
 | B06 | Cost-knowledge filter; insufficient knowledge creates missing cost items |
-| A01 | Yes=1, No=0, Unknown=missing |
+| A01 | Import text yes / no / not known; omitted/declined answers remain missing with their reason; do not use numeric 1/0 |
 | A02 | Never=0 through Daily=4; ordinal primary adoption indicator |
 | A03 | None=0 through 75–100%=4; ordinal secondary coverage indicator |
 | A04 | No use=0 through Embedded=3; ordinal secondary integration indicator; Changed too much and Not known are separate non-scored categories |
@@ -136,11 +140,13 @@ X03. Describe one operational benefit, difficulty, or unchanged outcome you cons
 | P01–P03; E01–E03; K01–K03; D01–D03 | 1–5; unknown/not applicable missing with separate missing-reason code |
 | X01–X03 | Context only; redact identifying text before reporting |
 
-Do not sum A02–A04 into an adoption scale or report Cronbach's alpha for them: they are distinct adoption descriptors. If supported, mean each three-item outcome domain separately with all three responses present. Report domain-specific N. A two-of-three mean is a sensitivity alternative only. High scores indicate more favourable perceived performance; no items require reverse coding. Do not generate an overall efficiency score without additional conceptual and measurement justification.
+Do not sum A02–A04 into an adoption scale or report Cronbach's alpha for them: they are distinct adoption descriptors. If supported, mean each three-item outcome domain separately with all three responses present. Report domain-specific N. A two-of-three mean is a possible separately reviewed sensitivity analysis, not an automatic pipeline feature. High scores indicate more favourable perceived performance; no items require reverse coding. Do not generate an overall efficiency score without additional conceptual and measurement justification.
+
+The importer retains eligible records with documented missing analytical answers, but missing eligibility cannot establish inclusion. Schema/metadata errors stop the import; invalid codes in applicable analytical fields exclude the row with an audit reason. Unknown-adoption and cost-knowledge routes are applied before numeric checks for their skipped fields. Deduplication retains the earliest eligible valid-coded organisation/unit report. Any reviewed correction is made in a coding copy with a dated log, preserving the original export.
 
 ## Item-development traceability
 
-All statements above are original draft wording; none is claimed to reproduce a validated published scale. AI-use questions are informed at the concept level by NIST's 2024 taxonomy and enterprise/workplace survey distinctions. Productivity relevance is informed by Brynjolfsson et al. (2025), but these perceptions are not their operational productivity measure. Cost and decision items require reviewer assessment for observability and coverage. Sources and full limitations appear in the Chapters 1–3 document.
+All statements above are original draft wording; none is claimed to reproduce a validated published scale. AI-use questions are informed at the concept level by the NIST taxonomy (Theofanos et al., 2024) and enterprise/workplace survey distinctions. Productivity relevance is informed by Brynjolfsson et al. (2025), but these perceptions are not their operational productivity measure. Cost and decision items require reviewer assessment for observability and coverage. Sources and full limitations appear in the main report.
 
 ## Specific pilot checks
 

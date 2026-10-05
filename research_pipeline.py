@@ -110,11 +110,25 @@ def clean_records(raw):
         events, errors, reasons = [], [], {}
         for field, choices in ENUMS.items():
             row[field] = row[field].lower()
+            if field in ('A01', 'B06') and row[field] in MISSING:
+                reasons[field] = MISSING[row[field]]
+                row[field] = None
+                continue
             if row[field] not in choices:
                 errors.append(f'invalid_{field}')
         if row['questionnaire_version'] != '0.3':
             errors.append('questionnaire_version_not_0.3')
         for field in RANGES:
+            if field in ('A02', 'A03', 'A04') and (row['S07'] == 'unknown ai status' or row['A01'] in (None, 'not known')):
+                if str(row[field]).strip():
+                    events.append(f'{field}_removed_by_unknown_adoption_route')
+                row[field], reasons[field] = None, 'adoption_unknown'
+                continue
+            if field in DOMAINS['cost'] and row['B06'] != 'sufficient':
+                if str(row[field]).strip():
+                    events.append(f'{field}_removed_by_cost_route')
+                row[field], reasons[field] = None, 'skipped_by_design'
+                continue
             try:
                 row[field], reasons[field] = numeric(row[field], field)
             except ValueError:
@@ -129,7 +143,7 @@ def clean_records(raw):
         if key in seen:
             audit.append({'input_row': number, 'status': 'excluded', 'reasons': ['duplicate_unit_later_submission']})
             continue
-        if row['S07'] == 'unknown ai status' or row['A01'] == 'not known':
+        if row['S07'] == 'unknown ai status' or row['A01'] in (None, 'not known'):
             for field in ('A02', 'A03', 'A04'):
                 row[field], reasons[field] = None, 'adoption_unknown'
             events.append('unknown_adoption_not_scored')
@@ -279,13 +293,13 @@ def results_markdown(result):
     text = f'## Imported evidence and analysis\n\n**{label}**\n\n'
     text += f"Imported records: {result['imported_records']}; retained eligible main-phase units: {a['retained_units']}; organisations: {a['organisations']}. These counts come only from the supplied file.\n\n"
     text += f"Adoption frequency unclassified/missing: {a['adoption_unknown']}. Largest contributing organisation: {a['largest_organisation_units']} retained units. Organisation dependence flagged: {a['organisation_dependence_present']}. Inference requested: {a['inference_requested']}; organisation structure permits it: {a['inference_permitted']}. These flags do not establish statistical assumptions.\n\n"
-    text += '### Item descriptions\n\n| Item | Valid N | Missing | Median |\n|---|---|---|---|\n'
+    text += '### 4.1 Item descriptions\n\n**Table 4.1. Outcome-item summaries from supplied records**\n\n| Item | Valid N | Missing | Median |\n|---|---|---|---|\n'
     for item, summary in a['items'].items():
         text += f"| {item} | {summary['n']} | {summary['missing']} | {fmt(summary['median'])} |\n"
-    text += '\n### Supported-domain associations\n\n| Domain | N | Spearman rho | Raw p | Holm p | Status |\n|---|---|---|---|---|---|\n'
+    text += '\n### 4.2 Supported-domain associations\n\n**Table 4.2. Conditional adoption–outcome associations**\n\n| Domain | N | Spearman rho | Raw p | Holm p | Status |\n|---|---|---|---|---|---|\n'
     for name, summary in a['associations'].items():
         text += f"| {name} | {fmt(summary['n'])} | {fmt(summary['rho'])} | {fmt(summary['p'])} | {fmt(summary['holm_p'])} | {summary['status']} |\n"
-    text += '\nScores are withheld unless the researcher supplies measurement support. Internal consistency is diagnostic, not validation. Exact permutation tests use all permutations at N ≤ 7; larger samples use 1,999 seeded shuffles with a plus-one correction. Holm adjustment retains the original family of four. Tests require independent, exchangeable observations and a researcher rationale; more than one unit per organisation disables inferential p-values. No confidence intervals are implemented; none is fabricated. No causal or population-representative conclusion is generated.\n'
+    text += '\nTables 4.1 and 4.2 use analysis-specific counts. Full item distributions, missing reasons, and alpha diagnostics are retained in the private analysis file. Scores are withheld unless the researcher supplies measurement support. Internal consistency is diagnostic, not validation. Exact permutation tests use all permutations at N ≤ 7; larger samples use 1,999 seeded shuffles with a plus-one correction. Holm adjustment retains the original family of four. Tests require independent, exchangeable observations under the independence null and a researcher rationale; more than one unit per organisation disables inferential p-values. They are not a general test of zero rank correlation under dependence. No confidence intervals are implemented; none is fabricated. No causal or population-representative conclusion is generated. Researcher disclosure review is required before sharing aggregates.\n'
     return text
 
 
@@ -303,22 +317,28 @@ def chart(result):
 
 def dictionary_markdown():
     text = '# Appendix B: Data Dictionary and Analysis Rules\n\n'
-    text += 'Use coded UTF-8 CSV or a JSON array with one row per submitted unit report. Required columns may contain documented missing tokens for analytical items, but eligibility must be affirmatively established. No questionnaire response rows are shipped.\n\n| Field | Allowed values / meaning |\n|---|---|\n'
+    text += 'Use coded UTF-8 CSV or a JSON array with one row per submitted unit report. Required columns may contain documented missing tokens for analytical items, A01, and B06, but eligibility must be affirmatively established. Table B.1 gives the authoritative importer schema; no response rows are supplied.\n\n**Table B.1. Required import fields and codes**\n\n| Field | Allowed values / meaning |\n|---|---|\n'
     for field in REQUIRED:
         if field in ENUMS:
             meaning = ', '.join(sorted(ENUMS[field]))
+            if field in ('A01', 'B06'):
+                meaning += '; documented missing tokens allowed'
         elif field in RANGES:
             low, high = RANGES[field]
             meaning = f'Integer {low}–{high}; missing tokens allowed' + ('; changed also allowed' if field == 'A04' else '')
         elif field == 'submitted_at':
             meaning = 'ISO 8601 timestamp with timezone; earliest eligible submission retained'
         elif field == 'questionnaire_version':
-            meaning = '0.3; other versions need a reviewed mapping'
+            meaning = 'Text 0.3; other versions need a reviewed mapping'
+        elif field == 'organisation_code':
+            meaning = 'Non-empty text code; use consistently for the same organisation'
+        elif field == 'unit_code':
+            meaning = 'Non-empty text code identifying the unit within its organisation; pair used for deduplication'
         else:
-            meaning = 'Non-empty coded identifier; no names/emails; record_id unique'
+            meaning = 'Non-empty text code; no names/emails; record_id unique after whitespace trimming'
         text += f'| {field} | {meaning} |\n'
     text += '\nMissing tokens: empty, Not known/unknown, Not applicable/NA, Prefer not to answer. They remain distinct missing reasons, never zero or the midpoint. A02 codes: 0 Never; 1 Less than monthly; 2 Monthly but less than weekly; 3 Weekly but less than daily; 4 Daily/almost daily. A03: 0 None; 1 >0–<25%; 2 25–<50%; 3 50–<75%; 4 75–100%. A04: 0 No use; 1 Isolated use; 2 Selected workflows; 3 Embedded workflows; changed non-scored. B06: none/limited/sufficient correspond to cost knowledge. S07 unknown ai status corresponds to the questionnaire\'s longer unknown-status option. Outcome codes 1–5 follow the questionnaire agreement scale.\n\n'
-    text += 'Optional additional export columns are retained privately, not included in aggregate reports. B04/B05 map to organisation_code/unit_code; the remaining contextual questions and free text are not analysed automatically. Export platforms must map their own headings/labels explicitly to these codes; the importer never guesses labels. Excel exports must be saved as UTF-8 CSV. Complete three-item means are scored only for researcher-supported domains. Alpha is an exploratory diagnostic and cannot establish construct validity. No grand efficiency score is produced. No cluster inference, regression, mediation, ROI, or automatic empirical conclusion is implemented.\n'
+    text += 'A01 uses text yes/no/not known, not numeric 1/0; B06 uses none/limited/sufficient. Omitted or declined A01 leaves adoption unclassified; omitted or declined B06 masks cost answers and retains its missing reason. Eligibility uncertainty requires documented resolution in a reviewed coding copy before import. Optional additional export columns are retained privately, not included in aggregate reports. B04/B05 map to organisation_code/unit_code; the remaining contextual questions and free text are not analysed automatically. Export platforms must map their own headings/labels explicitly to these codes; the importer never guesses labels. Excel exports must be saved as UTF-8 CSV. Complete three-item means are scored only for researcher-supported domains. Alpha is an exploratory diagnostic and cannot establish construct validity. No grand efficiency score is produced. No cluster inference, regression, mediation, ROI, or automatic empirical conclusion is implemented.\n'
     return text
 
 

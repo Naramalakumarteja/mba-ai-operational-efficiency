@@ -1,6 +1,6 @@
 # Recruitment and data-collection pack
 
-**1 October 2026 | Planning draft | No invitations sent or responses collected**
+**Updated 5 October 2026 | Planning draft | No research invitations or responses evidenced**
 
 Use with questionnaire v0.3 and the expert-review/pilot kit. This document prepares recruitment; it does not establish institutional permission, participant consent, or survey validation. Replace bracketed fields with actual information before use.
 
@@ -16,6 +16,8 @@ Do not expand the geographic boundary simply to meet a numerical target. If the 
 
 Create one row per potential organisation, without storing personal contact details in the analytical dataset.
 
+**Table R.1. Recruitment planning template**
+
 | Organisation code | Contact route | Eligible units estimated | Eligible leaders estimated | Permission requirements | Access status | Invitation denominator known? | Notes |
 |---|---|---|---|---|---|---|---|
 | To be entered | | | | | | | |
@@ -23,6 +25,8 @@ Create one row per potential organisation, without storing personal contact deta
 Access status options: not assessed; contact identified; permission pending; accessible; declined; out of scope. Blank estimates mean unknown, not zero. Do not enter fictitious organisations or assume permission from a contact's interest.
 
 ### Unit-level recruitment log
+
+**Table R.2. Recruitment planning template**
 
 | Organisation code | Unit code | Activity | Location confirmed | Eligibility confirmed | Invitation date | Pilot/main phase | Submission status | Duplicate flag | Final disposition |
 |---|---|---|---|---|---|---|---|---|---|
@@ -80,6 +84,8 @@ Use the participant invitation with this replacement opening: “I invite you to
 
 Complete the following before setting a final recruitment target:
 
+**Table R.3. Recruitment planning template**
+
 | Decision | Entry required | Current status |
 |---|---|---|
 | Accessible organisations and units | Actual access-log totals | Unknown |
@@ -91,7 +97,7 @@ Complete the following before setting a final recruitment target:
 | Organisation dependence | Actual number and concentration of organisations | Pending |
 | Final invitation ceiling and stopping rule | Feasibility and analysis-specific justification | Pending |
 
-Do not convert the earlier illustrative 120 independent observations into a fixed requirement. Ordinal ties, organisation dependence, and domain-specific missingness can change analysis requirements. Do not rely on a simple population-size formula to justify a purposive sample.
+The illustrative planning calculation in the main report is not a fixed recruitment requirement. Ordinal ties, organisation dependence, and domain-specific missingness can change analysis requirements. Do not rely on a simple population-size formula to justify a purposive sample.
 
 ## 6. Data-handling workflow
 
@@ -106,13 +112,15 @@ Do not convert the earlier illustrative 120 independent observations into a fixe
 9. Remove identifying open-text details and suppress revealing small cells in reports.
 10. Apply the actual retention/deletion schedule established by institutional requirements.
 
-## 7. Minimum analytical record structure
+## 7. Import fields and separate contextual records
 
-One row represents one operational unit, not one task or one manager rating. Field names align with questionnaire IDs. Include: record_id; phase; questionnaire_version; organisation_code; unit_code; eligibility_status; exclusion_reason; submitted_at; S01–S07 including S03b; B01–B03 and B06; A01–A08 including A07b; P01–P03; E01–E03; K01–K03; D01–D03; X01–X03; and data-quality flags.
+One row represents one submitted operational-unit report, not one task or one independent observation for every manager. Appendix B of the generated main report is the authoritative import dictionary. Required columns are: record_id; organisation_code; unit_code; submitted_at; phase; questionnaire_version; C01; S01; S02; S03; S03b; S04; S05; S06; S07; B06; A01; A02; A03; A04; P01–P03; E01–E03; K01–K03; and D01–D03. Analytical omissions may be coded as documented missing values; consent and eligibility must be affirmatively established. Header presence is required even for skipped analytical answers.
+
+B01–B03, A05–A08 including A07b, X01–X03, and other context are optional additional export columns retained privately; the importer does not automatically summarise them. Recruitment dates, invitation denominators, permissions, and contact routes belong in separate logs. Eligibility dispositions, exclusion reasons, and route flags are audit outputs, not required invented response fields. The current analysis does not automatically produce the full contextual/recruitment profile.
 
 B04 and B05 correspond to organisation_code and unit_code; avoid creating inconsistent duplicate identifiers. Store a missing-reason field where necessary to distinguish skipped by design, not known, not applicable, declined, and technical omission. Numeric analytical fields remain empty/missing for these reasons, never artificial values such as 99 included in averages.
 
-Derived fields may include productivity_mean, process_mean, cost_mean, and decision_mean only when domain scoring is supported. No overall efficiency total or summed adoption scale is authorised. Keep raw answers alongside any derived fields.
+Domain means are calculated internally for supported-domain associations; the current cleaned export does not add those proposed mean-field names as columns. No overall efficiency total or summed adoption scale is authorised. Preserve the original answers separately from the coded analytical copy. Uncertain location/sector and other activity are excluded by the importer; any legitimate resolution must be documented in a reviewed coding copy before import, without guessing eligibility.
 
 ## 8. Readiness gate
 

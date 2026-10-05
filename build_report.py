@@ -20,9 +20,9 @@ nav a{display:block;padding:8px 0;color:var(--accent);text-decoration:none;borde
 nav a:hover,nav a:focus{text-decoration:underline}main{background:white;padding:48px;border-radius:8px;min-width:0}
 h1,h2,h3{font-family:system-ui,sans-serif;line-height:1.3;scroll-margin-top:24px}h1{font-size:1.8rem;margin-top:48px}
 h1:first-child{margin-top:0}h2{font-size:1.3rem;margin-top:36px}h3{font-size:1.1rem;margin-top:28px}
-a{color:var(--accent);overflow-wrap:anywhere}p,li{overflow-wrap:anywhere}.table-wrap{overflow-x:auto;margin:24px 0}
+a{color:var(--accent);overflow-wrap:anywhere}p,li{overflow-wrap:anywhere}img{max-width:100%;height:auto}.table-wrap{overflow-x:auto;margin:24px 0}
 table{border-collapse:collapse;width:100%;font:14px/1.5 system-ui,sans-serif}th,td{padding:12px;text-align:left;border:1px solid var(--line);vertical-align:top}
-th{background:#eaf1f3}code{font-size:.9em;background:#f0f4f5;padding:2px 4px}.badge{padding:16px;border-left:4px solid var(--accent);background:#eaf1f3;font:14px/1.6 system-ui,sans-serif;margin-bottom:32px}
+th{background:#eaf1f3}code{font-size:.9em;background:#f0f4f5;padding:2px 4px}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f0f4f5;padding:16px;font:13px/1.6 monospace}.badge{padding:16px;border-left:4px solid var(--accent);background:#eaf1f3;font:14px/1.6 system-ui,sans-serif;margin-bottom:32px}
 button{background:var(--accent);color:white;border:0;border-radius:4px;padding:12px 18px;cursor:pointer;font:inherit;margin:16px 0}
 button:focus-visible,a:focus-visible{outline:3px solid #d98218;outline-offset:3px}footer{font:13px/1.5 system-ui,sans-serif;color:var(--muted);border-top:1px solid var(--line);padding-top:20px;margin-top:40px}
 @media(max-width:800px){.shell{display:block;padding:16px}nav{position:static;max-height:none;margin-bottom:24px}main{padding:24px}h1{font-size:1.5rem}}
@@ -40,6 +40,7 @@ def load_sources(report: Path = REPORT, questionnaire: Path = QUESTIONNAIRE) -> 
     survey = questionnaire.read_text(encoding="utf-8-sig").strip()
     if not source or not survey:
         raise ValueError("Report and questionnaire sources must not be empty.")
+    survey = re.sub(r'^# ', '## ', survey, count=1)
     return source + "\n\n# Appendix A: Draft Survey Instrument\n\n" + survey + "\n"
 
 
@@ -67,7 +68,7 @@ def render(source: str, imported_evidence: bool = False, synthetic: bool = False
 
     # Source files contain research prose, not executable HTML. Escape raw tags.
     safe_source = source.replace("<", "&lt;").replace(">", "&gt;")
-    md = markdown.Markdown(extensions=["tables", "toc", "sane_lists"],
+    md = markdown.Markdown(extensions=["tables", "toc", "sane_lists", "fenced_code"],
                            extension_configs={"toc": {"toc_depth": "1-1"}})
     body = md.convert(safe_source)
     # Turn bare bibliographic URLs into clickable links without nesting links.
@@ -83,7 +84,7 @@ def render(source: str, imported_evidence: bool = False, synthetic: bool = False
     body = "".join(parts).replace("<table>", '<div class="table-wrap"><table>').replace("</table>", "</table></div>")
     title = html.escape("AI Adoption and Operational Efficiency — MBA Research Project")
     status = ('Aggregate analysis from researcher-declared genuine input is included. Authenticity and institutional acceptance are not independently established.'
-              if imported_evidence else 'Chapters 1–3 and the draft instrument are developed. No survey data have been collected; Chapters 4–5 document the evidence status rather than invented results.')
+              if imported_evidence else 'The research-design narrative and draft instrument are developed. No survey data have been collected; empirical results and final interpretation remain pending.')
     if synthetic:
         status = 'SYNTHETIC SOFTWARE TEST ONLY — NOT RESEARCH FINDINGS. This isolated report tests rendering; no respondents are represented.'
     return f"""<!doctype html>
@@ -93,7 +94,7 @@ def render(source: str, imported_evidence: bool = False, synthetic: bool = False
 <button type="button" onclick="window.print()">Print / Save as PDF</button>{md.toc}</nav>
 <main><div class="badge"><strong>Research design report · Chennai IT-enabled services</strong><br>
 {status}</div>
-{body}<footer>Generated reproducibly from the report and questionnaire sources. Offline document: no analytics, uploads, or network requests.</footer></main></div></body></html>"""
+{body}<footer>Generated reproducibly from the report and questionnaire sources. Offline document with no analytics, uploads, or automatic network requests; external reference links open their cited sources.</footer></main></div></body></html>"""
 
 
 def build(output: Path, input_path: Path | None = None, manifest_path: Path | None = None,
@@ -127,13 +128,15 @@ def build(output: Path, input_path: Path | None = None, manifest_path: Path | No
         first = source.index('# Chapter 4:')
         last = source.index('# Chapter 5:')
         diagram = base64.b64encode(chart(result).encode()).decode()
-        source = source[:first] + '# Chapter 4: Supplied Evidence Analysis\n\n' + results_markdown(result) + f'\n![Adoption frequency in supplied sample](data:image/svg+xml;base64,{diagram})\n\n' + source[last:]
+        source = source[:first] + '# Chapter 4: Supplied Evidence Analysis\n\n' + results_markdown(result) + f'\n### 4.3 Adoption-frequency figure\n\nFigure 4.1 displays classified frequency counts; unknown/unclassified frequency is reported separately above.\n\n![Adoption frequency in supplied sample](data:image/svg+xml;base64,{diagram})\n\n**Figure 4.1. Reported AI-use frequency in retained supplied records**\n\n' + source[last:]
         first = source.index('## Document status')
-        last = source.index('## Proposed synopsis')
+        last = source.index('## Abstract — research-design edition')
         source = source[:first] + '## Document status\n\nThis edition includes aggregate analysis of researcher-declared genuine input. Source provenance is declared, not independently verified. Chapter 3 remains the planned methodology; the analysis protocol must be reviewed against actual collection. Institutional acceptance and empirical interpretation remain external requirements.\n\n' + source[last:]
         if synthetic_check:
             source = source.replace('This edition includes aggregate analysis of researcher-declared genuine input.',
                                     'SYNTHETIC SOFTWARE TEST ONLY: all imported records are generated software fixtures, not respondents.')
+        source = source.replace('No genuine respondent data are available in this edition, so it reports no empirical estimates or findings.',
+                                'Supplied-record aggregates are presented in Chapter 4; this design abstract does not interpret them as completed research findings.')
         source = source.replace('The design has no empirical conclusion about the direction or magnitude of adoption–performance relationships.',
                                 'The software generates descriptive estimates and, where enabled, conditional tests, but no empirical conclusion is inferred automatically.')
         source = source.replace('No participant review, pilot, main survey dataset, or empirical results exist.',

@@ -8,6 +8,8 @@ Use this kit to evaluate the questionnaire before main recruitment. The instrume
 
 ## 1. Internal review completed
 
+**Table E.1. Instrument-review specification**
+
 | Issue found | Revision/action | Remaining uncertainty |
 |---|---|---|
 | Tenure categories used mixed month/year boundaries | Replaced with non-overlapping month intervals | Respondent recall |
@@ -28,6 +30,8 @@ Seek two or three reviewers covering service operations and research methods, in
 For each item, score clarity and relevance separately: 1 = major problem; 2 = needs substantial revision; 3 = minor revision; 4 = suitable as written. Record the reason, not merely a score. No passing average automatically validates an item.
 
 Review form fields:
+
+**Table E.2. Instrument-review specification**
 
 | Item ID | Intended concept | Clarity 1–4 | Relevance 1–4 | Answerable by target respondent? | Bias/overlap concern | Suggested wording | Researcher decision |
 |---|---|---|---|---|---|---|---|
@@ -68,6 +72,8 @@ Record interpretation, evidence used, difficulty, proposed revision, and duratio
 ## 4. Survey routing checks
 
 Run these cases through the actual survey platform before any pilot. They are test scenarios, not research participants, and must never enter the research dataset.
+
+**Table E.3. Instrument-review specification**
 
 | Scenario | Expected route |
 |---|---|
