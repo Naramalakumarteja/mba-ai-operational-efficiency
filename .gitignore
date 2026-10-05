@@ -1,0 +1,22 @@
+# Local analysis and participant material must never be published.
+work/
+private/
+data/
+responses/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*credentials*
+*token*
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.DS_Store
+Thumbs.db
+# Rebuildable presentation output
+outputs/*.html
