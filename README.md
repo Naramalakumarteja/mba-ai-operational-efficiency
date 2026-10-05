@@ -16,12 +16,18 @@ The project examines whether reported operational AI use is associated with perc
 - Offline HTML report with section navigation, responsive layout, readable tables, and browser print/save-as-PDF.
 - Source checks for chapter completeness, questionnaire items, duplicate appendix, and machine-specific paths.
 - Automated tests of navigation, output, error handling, and raw HTML escaping.
+- Coded CSV/JSON import with eligibility, consent, version, duplicate, adoption, and cost-route checks.
+- Missing-reason audit, item distributions/medians, diagnostic internal consistency, and an adoption SVG chart.
+- Conditional Spearman/permutation-test and Holm framework, gated by measurement support and independent-unit rationale.
+- Genuine-evidence report integration; synthetic inputs are rejected from the research report.
 
 ## Technology and architecture
 
 Python 3.10+ and Python-Markdown 3.11. No database, backend framework, cloud service, API key, or JavaScript dependency is needed. The small inline print action uses the browser's native print dialog.
 
 Workflow: report Markdown + questionnaire Markdown → source validation → Markdown rendering → self-contained HTML. Historical review/recruitment documents remain available but are not required to view or build the main report.
+
+Data workflow: researcher-coded input + SHA-256 provenance manifest → chronological eligibility/deduplication → private cleaned records and audit → item summaries and supported-domain analysis → private aggregate report. The new pipeline uses only Python's standard library; the rendering dependency is unchanged.
 
 ## Setup
 
@@ -57,7 +63,7 @@ Visit `http://127.0.0.1:8000/MBA_Project_Report.html`. Stop the server with Ctrl
 
 ```sh
 python -m unittest discover -s tests -v
-python -m py_compile build_report.py tests/test_report.py
+python -m py_compile build_report.py research_pipeline.py tests/test_report.py tests/test_pipeline.py
 ```
 
 Tests use no real participant data and do not validate the questionnaire scientifically. There is no configured linter or type-checking tool; neither is required to build this small document renderer.
@@ -66,14 +72,18 @@ Tests use no real participant data and do not validate the questionnaire scienti
 
 ```text
 build_report.py                   Report builder and source validation
+research_pipeline.py              Import, validation, cleaning, analysis, SVG/tables
+SUBMISSION_BLOCKERS.md             Exact external evidence and requirements needed
 requirements.txt                  Single pinned rendering dependency
 tests/test_report.py              Critical automated checks
+tests/test_pipeline.py            Isolated synthetic software tests
 outputs/
   MBA_Project_Chapters_1_to_3.md   Main report source (historical filename)
   MBA_Draft_Questionnaire.md       Canonical questionnaire source
   MBA_Project_Report.html         Generated offline report, ignored by Git
   other .md files                 Existing research support documents
 work/                             Ignored scratch area
+private/                          Ignored genuine input and analysis output
 ```
 
 The historical main-report filename is retained to preserve existing links. It now contains all five chapter headings, with Chapters 4–5 transparently documenting the lack of data. The standalone questionnaire is the authoritative source for the generated appendix.
@@ -86,4 +96,35 @@ The intended GitHub repository is private. The initial audit found no repository
 
 ## Limitations and future improvements
 
-The unknown institution requirements, respondent access, external questionnaire review, pilot, justified sample target, and collected data prevent empirical completion. Perceptions cannot establish causal effects, verified financial savings, or sector-wide adoption rates. Future work is genuine review and collection, followed by measurement assessment and analysis appropriate to organisational dependence. Final institution formatting can be applied when requirements are known. The current build does not collect surveys or compute statistical findings.
+The unknown institution requirements, respondent access, external questionnaire review, pilot, justified sample target, and collected data prevent empirical completion. Perceptions cannot establish causal effects, verified financial savings, or sector-wide adoption rates. Final institution formatting requires actual requirements. The software does not collect surveys or certify provenance; it processes supplied coded records. Cluster inference, regression, confidence intervals, and automatic empirical conclusions are deliberately absent. A supported descriptive association is not proof of causality; no numeric findings exist until genuine input is supplied.
+
+## Add genuine questionnaire responses and rerun
+
+Appendix B of the generated report is the complete import data dictionary. Questionnaire text is in Appendix A. Create an **empty** header-only template (no generated responses):
+
+```sh
+python research_pipeline.py --template private/responses.csv
+```
+
+Map an actual survey export explicitly to these columns/codes. Keep the original export separately under `private/`. JSON input is also supported as an array of objects with the same keys. Excel must be exported to UTF-8 CSV; no column or category mappings are guessed. `submitted_at` must contain a timezone. Phase `pilot`/`test` is excluded from main analysis. Unknown eligibility is excluded until reviewed. Invalid answer codes are excluded with row-number reasons; malformed files/metadata fail explicitly. Optional contextual/free-text columns stay private and are not automatically analysed.
+
+Compute the checksum of the actual file:
+
+```sh
+python -c "from research_pipeline import checksum; print(checksum('private/responses.csv'))"
+```
+
+Create `private/study.json` yourself with these keys: `evidence_kind` (real only for actual research records), `provenance` (truthful collection/export account), `input_sha256` (the printed digest), `supported_domains` (initially an empty array), and `independent_unit_inference` (initially false). These instructions provide no invented provenance or checksum. Supported domains may be `productivity`, `process`, `cost`, and `decision`; enabling them requires `measurement_support_note` from genuine methodological assessment. Enabling inference requires `independence_note` explaining independence/exchangeability. Merely writing a note does not establish validity.
+
+```sh
+python research_pipeline.py --input private/responses.csv --manifest private/study.json --out private/analysis
+python build_report.py --input private/responses.csv --manifest private/study.json --output private/MBA_Project_Report.html
+```
+
+The pipeline preserves input files and writes `cleaned.json`, `audit.json`, `analysis.json`, `results.md`, and `adoption.svg`. All are private/ignored. The combined report replaces the evidence-status chapter with computed aggregates but generates no final empirical judgment. Without input, `python build_report.py` still creates the honest no-evidence report.
+
+Three-item domain means require complete answers and researcher support. Unknown/declined/not-applicable values remain missing; cost answers from insufficiently informed respondents are masked and logged. Duplicate units retain the earliest eligible timestamp, not the export's row order. Tests use exact permutations at N ≤ 7 and 1,999 seeded permutations otherwise. Holm adjustment keeps four planned comparisons; untested outcomes are not assigned observed p-values. More than one retained unit per organisation disables p-values. One unit per organisation alone does not establish independence: the researcher must justify it. No confidence intervals are generated. Alpha diagnostics do not establish validity or determine score support automatically.
+
+## Synthetic software testing
+
+Fixtures are generated only by `tests/test_pipeline.py` inside temporary directories under ignored `work/`; all carry synthetic provenance and are never bundled as research records. Synthetic pipeline output is prominently labelled and must remain under `work/`. The final report refuses synthetic manifests. For isolated integration testing only, `build_report.py --synthetic-check --input work/synthetic.json --manifest work/test-manifest.json --output work/synthetic-check.html` renders a clearly labelled test report. This mode cannot write to research output directories. No persistent demo dataset or simulated final findings is shipped. The software cannot prove whether a researcher falsely labels input; provenance remains an external responsibility.

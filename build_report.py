@@ -58,7 +58,7 @@ def validate_source(source: str) -> None:
         raise ValueError("Machine-specific paths must not appear in the report.")
 
 
-def render(source: str) -> str:
+def render(source: str, imported_evidence: bool = False, synthetic: bool = False) -> str:
     try:
         import markdown
     except ImportError as exc:
@@ -82,20 +82,61 @@ def render(source: str) -> str:
             parts[i] = re.sub(r"https://[^\s<]+", lambda m: '<a href="' + html.escape(m[0], quote=True) + '">' + m[0] + '</a>', part)
     body = "".join(parts).replace("<table>", '<div class="table-wrap"><table>').replace("</table>", "</table></div>")
     title = html.escape("AI Adoption and Operational Efficiency — MBA Research Project")
+    status = ('Aggregate analysis from researcher-declared genuine input is included. Authenticity and institutional acceptance are not independently established.'
+              if imported_evidence else 'Chapters 1–3 and the draft instrument are developed. No survey data have been collected; Chapters 4–5 document the evidence status rather than invented results.')
+    if synthetic:
+        status = 'SYNTHETIC SOFTWARE TEST ONLY — NOT RESEARCH FINDINGS. This isolated report tests rendering; no respondents are represented.'
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title}</title><style>{CSS}</style></head><body>
 <div class="shell"><nav aria-label="Report sections"><strong>MBA research project</strong>
 <button type="button" onclick="window.print()">Print / Save as PDF</button>{md.toc}</nav>
 <main><div class="badge"><strong>Research design report · Chennai IT-enabled services</strong><br>
-Chapters 1–3 and the draft instrument are developed. No survey data have been collected; Chapters 4–5 document the evidence status rather than invented results.</div>
-{body}<footer>Generated from the repository's report and questionnaire. Offline document: no analytics, uploads, or participant-data storage.</footer></main></div></body></html>"""
+{status}</div>
+{body}<footer>Generated reproducibly from the report and questionnaire sources. Offline document: no analytics, uploads, or network requests.</footer></main></div></body></html>"""
 
 
-def build(output: Path) -> Path:
+def build(output: Path, input_path: Path | None = None, manifest_path: Path | None = None,
+          synthetic_check: bool = False) -> Path:
+    from research_pipeline import dictionary_markdown, run, results_markdown, chart
     source = load_sources()
     validate_source(source)
-    page = render(source)
+    if bool(input_path) != bool(manifest_path):
+        raise ValueError('Supply both --input and --manifest to include actual analysis.')
+    imported = input_path is not None
+    if synthetic_check and not imported:
+        raise ValueError('Synthetic check needs explicitly labelled input and a manifest.')
+    if imported:
+        import base64
+        import json
+        manifest = json.loads(manifest_path.read_text(encoding='utf-8-sig'))
+        kind = manifest.get('evidence_kind') if isinstance(manifest, dict) else None
+        if kind != ('synthetic' if synthetic_check else 'real'):
+            raise ValueError('Synthetic/test analysis is prohibited in the research report.')
+        target = ROOT / ('work' if synthetic_check else 'private')
+        if not output.resolve().is_relative_to(target.resolve()):
+            raise ValueError('Research reports require private/; synthetic checks require work/.')
+        if output.resolve() in (input_path.resolve(), manifest_path.resolve()):
+            raise ValueError('Report destination must not overwrite input or provenance files.')
+        result = run(input_path, manifest_path, output.parent/'analysis')
+        first = source.index('# Chapter 4:')
+        last = source.index('# Chapter 5:')
+        diagram = base64.b64encode(chart(result).encode()).decode()
+        source = source[:first] + '# Chapter 4: Supplied Evidence Analysis\n\n' + results_markdown(result) + f'\n![Adoption frequency in supplied sample](data:image/svg+xml;base64,{diagram})\n\n' + source[last:]
+        first = source.index('## Document status')
+        last = source.index('## Proposed synopsis')
+        source = source[:first] + '## Document status\n\nThis edition includes aggregate analysis of researcher-declared genuine input. Source provenance is declared, not independently verified. Chapter 3 remains the planned methodology; the analysis protocol must be reviewed against actual collection. Institutional acceptance and empirical interpretation remain external requirements.\n\n' + source[last:]
+        if synthetic_check:
+            source = source.replace('This edition includes aggregate analysis of researcher-declared genuine input.',
+                                    'SYNTHETIC SOFTWARE TEST ONLY: all imported records are generated software fixtures, not respondents.')
+        source = source.replace('The design has no empirical conclusion about the direction or magnitude of adoption–performance relationships.',
+                                'The software generates descriptive estimates and, where enabled, conditional tests, but no empirical conclusion is inferred automatically.')
+        source = source.replace('No participant review, pilot, main survey dataset, or empirical results exist.',
+                                'Participant review and pilot evidence must be established separately from supplied main records.')
+        source = source.replace('Participant review, empirical data, actual analysis, and final conclusions are outstanding.',
+                                'Supplied data are processed in this edition; external validation, methodological review, and final empirical conclusions remain researcher responsibilities.')
+    source += '\n\n' + dictionary_markdown()
+    page = render(source, imported, synthetic_check)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(page, encoding="utf-8")
     return output
@@ -104,10 +145,13 @@ def build(output: Path) -> Path:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=ROOT / "outputs" / "MBA_Project_Report.html")
+    parser.add_argument('--input', type=Path, help='Coded genuine responses under private/.')
+    parser.add_argument('--manifest', type=Path, help='Provenance and analysis decisions for this file.')
+    parser.add_argument('--synthetic-check', action='store_true', help='Isolated software test report under work/; never research findings.')
     args = parser.parse_args()
     try:
-        path = build(args.output)
-    except (ValueError, OSError) as exc:
+        path = build(args.output, args.input, args.manifest, args.synthetic_check)
+    except (ValueError, OSError, TypeError) as exc:
         print(f"Build failed: {exc}", file=sys.stderr)
         return 1
     print(f"Report built: {path}")

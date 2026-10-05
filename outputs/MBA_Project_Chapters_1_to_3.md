@@ -253,6 +253,14 @@ No factor-analysis method is promised before sample adequacy is known. No causal
 
 ## 3.10 Reporting
 
+### Implemented reproducibility infrastructure — 5 October 2026
+
+The repository now includes a coded CSV/JSON importer, consent and eligibility checks, timestamp-based unit deduplication, explicit missing-reason handling, cost-knowledge routing, and a private cleaning audit. It produces item distributions, valid/missing denominators, medians, diagnostic internal consistency, and an adoption-frequency chart from supplied records. It does not generate or collect participant responses. The complete import dictionary is generated as Appendix B.
+
+Domain associations are enabled only after researcher-supplied measurement support. Independent-unit permutation tests require an explicit rationale and at most one retained unit per organisation. The software applies average ranks for ties and Holm adjustment across the four prespecified outcomes; it withholds p-values for clustered units. It implements exact permutations for up to seven pairs and 1,999 seeded random permutations otherwise, with a plus-one correction. Exchangeability and sampling assumptions require methodological assessment. No confidence intervals or cluster inference are implemented, so interval estimation remains a planned extension rather than a completed result.
+
+Input checksums and researcher-declared provenance identify the exact supplied file. They do not certify authenticity, informed consent, institutional approval, or measurement validity. Synthetic test input is rejected from the final research report. No real dataset was found during the 5 October 2026 repository/history audit; the default report consequently remains a no-evidence research-design edition.
+
 Results will report analysis-specific sample sizes, missingness, effect estimates, adjusted test results where appropriate, and material uncertainty. A positive finding may be written as 'Within the sampled units, higher reported AI-use frequency was associated with higher perceived productivity.' It will not be written as 'AI increased productivity in Chennai firms.' Recommendations will be proportionate to observed evidence and labelled as practical suggestions rather than demonstrated interventions.
 
 # References
