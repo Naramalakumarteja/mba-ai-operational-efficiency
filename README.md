@@ -57,7 +57,7 @@ Open `outputs/MBA_Project_Report.html` in a browser. It works offline without a 
 python -m http.server 8000 --bind 127.0.0.1 --directory outputs
 ```
 
-Visit `http://127.0.0.1:8000/MBA_Project_Report.html`. Stop the server with Ctrl+C. The server is a local read-only preview, not a survey collector. Rebuild after editing sources. An alternate destination is supported with `python build_report.py --output outputs/preview.html`.
+Visit `http://127.0.0.1:8000/MBA_Project_Report.html`. Stop the server with Ctrl+C. The server is a local read-only preview, not a survey collector. Rebuild after editing sources. An alternate HTML destination is supported with `python build_report.py --output outputs/preview.html`; other file extensions are rejected to protect source and configuration files.
 
 ## Tests and syntax checks
 
@@ -92,7 +92,7 @@ The historical main-report filename is retained to preserve existing links. It n
 
 Commit only report sources, code, tests, and documentation. Participant responses, contact details, code linkages, credentials, and exports belong outside this repository or in ignored local `private/`, `data/`, or `responses/` folders. Ignore rules reduce accidents but do not replace staged-diff review. Generated HTML is rebuilt locally.
 
-The intended GitHub repository is private. The initial audit found no repository or remote. Upload uses the existing authenticated GitHub account when permissions permit. A collaborator invitation requires a known collaborator username; no username is inferred from a relative's relationship.
+The configured GitHub repository is private: [mba-ai-operational-efficiency-chennai](https://github.com/Naramalakumarteja/mba-ai-operational-efficiency-chennai). Access and collaborator permissions are managed through GitHub.
 
 ## Limitations and future improvements
 
@@ -108,7 +108,7 @@ python research_pipeline.py --template private/responses.csv
 
 Map an actual survey export explicitly to these columns/codes. Keep the original export separately under `private/`. JSON input is also supported as an array of objects with the same keys. Excel must be exported to UTF-8 CSV; no column or category mappings are guessed. `submitted_at` must contain a timezone. Phase `pilot`/`test` is excluded from main analysis. Unknown eligibility is excluded until reviewed. Invalid answer codes are excluded with row-number reasons; malformed files/metadata fail explicitly. Optional contextual/free-text columns stay private and are not automatically analysed.
 
-Compute the checksum of the actual file:
+Metadata fields must be non-empty text, including JSON version codes such as `"0.3"`. Identifier whitespace is trimmed before duplicate checks; record identifiers must remain unique. Compute the checksum of the actual file:
 
 ```sh
 python -c "from research_pipeline import checksum; print(checksum('private/responses.csv'))"

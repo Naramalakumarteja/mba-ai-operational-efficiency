@@ -91,11 +91,14 @@ def clean_records(raw):
     ordered = []
     for number, row in enumerate(raw, 1):
         try:
-            stamp = datetime.fromisoformat(str(row['submitted_at']).replace('Z', '+00:00'))
+            if any(not isinstance(row[k], str) or not row[k].strip() for k in META):
+                raise ValueError('Metadata must contain non-empty text identifiers, timestamps and version codes.')
+            row = dict(row)
+            for key in META:
+                row[key] = row[key].strip()
+            stamp = datetime.fromisoformat(row['submitted_at'].replace('Z', '+00:00'))
             if stamp.tzinfo is None:
                 raise ValueError('submitted_at requires a timezone.')
-            if not all(str(row[k]).strip() for k in META):
-                raise ValueError('Metadata identifiers must be non-empty.')
             if row['record_id'] in ids:
                 raise ValueError('record_id must be unique.')
             ids.add(row['record_id'])

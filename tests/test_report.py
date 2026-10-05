@@ -2,6 +2,10 @@
 
 import tempfile
 import unittest
+import subprocess
+import sys
+import re
+import urllib.request
 from html.parser import HTMLParser
 from pathlib import Path
 
@@ -73,8 +77,32 @@ class ReportTests(unittest.TestCase):
 
     def test_unreadable_output_fails_instead_of_reporting_success(self):
         with tempfile.TemporaryDirectory() as directory:
+            destination = Path(directory) / 'directory.html'
+            destination.mkdir()
             with self.assertRaises(OSError):
-                build(Path(directory))
+                build(destination)
+
+    def test_preview_starts_and_serves_honest_report(self):
+        with tempfile.TemporaryDirectory() as directory:
+            build(Path(directory) / 'report.html')
+            process = subprocess.Popen(
+                [sys.executable, '-u', '-m', 'http.server', '0', '--bind', '127.0.0.1',
+                 '--directory', directory], stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                text=True)
+            try:
+                line = process.stdout.readline()
+                match = re.search(r'port (\d+)', line)
+                self.assertIsNotNone(match, line)
+                with urllib.request.urlopen(f'http://127.0.0.1:{match[1]}/report.html', timeout=5) as response:
+                    self.assertEqual(response.status, 200)
+                    page = response.read().decode('utf-8')
+                self.assertIn('Appendix B: Data Dictionary', page)
+                self.assertIn('No survey data have been collected', page)
+                self.assertNotIn('SYNTHETIC SOFTWARE TEST ONLY', page)
+            finally:
+                process.terminate()
+                process.wait(timeout=5)
+                process.stdout.close()
 
     def test_empty_sources_are_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -84,6 +112,14 @@ class ReportTests(unittest.TestCase):
             questionnaire.write_text('Questionnaire', encoding='utf-8')
             with self.assertRaisesRegex(ValueError, 'must not be empty'):
                 load_sources(report, questionnaire)
+
+    def test_report_cannot_overwrite_source_or_configuration(self):
+        from build_report import REPORT, QUESTIONNAIRE
+        for path in (REPORT, QUESTIONNAIRE, REPORT.parent.parent / 'requirements.txt'):
+            original = path.read_bytes()
+            with self.subTest(path=path), self.assertRaisesRegex(ValueError, '.html'):
+                build(path)
+            self.assertEqual(path.read_bytes(), original)
 
 
 if __name__ == "__main__":

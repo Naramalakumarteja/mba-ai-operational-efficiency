@@ -28,6 +28,11 @@ def fixture(index=0):
 
 
 class PipelineTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        # A fresh checkout has no ignored scratch directory.
+        (ROOT / 'work').mkdir(exist_ok=True)
+
     def test_eligible_and_non_user_routes(self):
         row = fixture()
         row.update(A01='no', A02='0', A03='0', A04='0')
@@ -84,6 +89,20 @@ class PipelineTests(unittest.TestCase):
             clean_records([row])
         with self.assertRaisesRegex(ValueError, 'unique'):
             clean_records([fixture(), fixture()])
+
+    def test_metadata_null_objects_and_normalised_duplicates_are_rejected(self):
+        for value in (None, '', '  ', 1, [], {}):
+            row = fixture()
+            row['record_id'] = value
+            with self.subTest(value=value), self.assertRaisesRegex(ValueError, 'non-empty text'):
+                clean_records([row])
+        first, second = fixture(), fixture(1)
+        second['record_id'] = '  ' + first['record_id'] + '  '
+        with self.assertRaisesRegex(ValueError, 'unique'):
+            clean_records([first, second])
+        first['organisation_code'] = '  TEST-ORG-0  '
+        cleaned, _ = clean_records([first])
+        self.assertEqual(cleaned[0]['organisation_code'], 'TEST-ORG-0')
 
     def test_ties_constant_and_negative_correlations(self):
         self.assertEqual(ranks([1, 1, 3]), [1.5, 1.5, 3])

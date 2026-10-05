@@ -99,6 +99,11 @@ def render(source: str, imported_evidence: bool = False, synthetic: bool = False
 def build(output: Path, input_path: Path | None = None, manifest_path: Path | None = None,
           synthetic_check: bool = False) -> Path:
     from research_pipeline import dictionary_markdown, run, results_markdown, chart
+    output = Path(output)
+    if output.suffix.lower() != '.html':
+        raise ValueError('Report destination must be an .html file; source files are never overwritten.')
+    if output.resolve() in (REPORT.resolve(), QUESTIONNAIRE.resolve()):
+        raise ValueError('Report destination must not overwrite research sources.')
     source = load_sources()
     validate_source(source)
     if bool(input_path) != bool(manifest_path):
