@@ -1,32 +1,17 @@
-## 1. COMPLETED
+# Current project status
 
-The research-design edition has a five-chapter academic narrative: a pre-data abstract, problem and bounded contribution, aligned objectives/questions/hypotheses, a nine-source literature synthesis, detailed methodology, pending-results framework, discussion procedure, limitations, research-conduct recommendations, and design conclusions. Tables have chapter/appendix captions. References are alphabetised and consistently cited; NIST authorship and the Science issue number were verified. There is no empirical figure or fabricated statistical result in this edition.
+## Complete implementation
 
-Appendix A contains the internally reviewed v0.3 questionnaire. Appendix B is generated from the actual import schema. Recruitment/review/protocol documents distinguish required fields, optional context, planned participant activity, and implemented analysis. The existing pipeline supports coded CSV/JSON, eligibility and chronological deduplication, route-aware missingness, item summaries, diagnostic alpha, conditional Spearman/permutation/Holm outputs, private audit files, and reproducible offline reports. Synthetic checks are isolated and labelled; they cannot enter the ordinary research report. These are implementation and internal-review achievements, not evidence of external validation or collection.
+Canonical scope: **Workplace AI Adoption, Perceived Performance and Implementation Barriers: A Comparative Secondary Analysis of OECD Employer and Worker Surveys**. The source data concern 2022 fieldwork in seven OECD countries and two sectors. The report, software, dependencies, tests, notebook, and package use this design. The old Chennai questionnaire study is archived, not the current findings source.
 
-[SUBMISSION_HANDOFF.md](SUBMISSION_HANDOFF.md) gives the supervisor-facing release workflow. [data/README.md](data/README.md) and the bundled header-only CSV/dictionary provide the exact response format without any respondent records. Original exports and computed data remain ignored; genuine coded input belongs under `private/`.
+Implemented: source hash verification, 152 source-cell extractions, 36 distribution checks (35 pass; one item excluded), 16 sector comparisons, firm-size comparisons, four charts, five-chapter PDF/HTML/Markdown report, references, presentation/viva guide, interactive explainer with browser speech, and a reproducible ZIP. These are software and descriptive-analysis achievements, not a new survey or causal study.
 
-## 2. REQUIRES EXTERNAL INPUT
+## Databricks status
 
-- **Actual institutional and participant-information requirements:** handbook/template/rubric, student/institution/supervisor/contact details, required permissions and consent arrangements, retention/withdrawal procedure, and deadline. Place truthful materials under `private/requirements/`; no institution rules or approvals are assumed.
-- **External instrument review and pilot evidence:** dated review/cognitive-interview/pilot records under `private/validation/`, followed by justified wording/coding and domain-support decisions. Current items are not formally validated. A revised instrument needs an explicit version mapping before main import.
-- **Real access and collection protocol:** accessible organisations/units, permissions, collection dates, stopping rule, invitation denominators where known, and sample/inference justification under `private/protocol.md` and restricted recruitment logs. No response target or independence assumption is established automatically.
-- **Genuine consented, de-identified records and provenance:** original export and coded UTF-8 CSV or JSON under `private/`, plus `private/study.json` declaring truthful provenance and the exact file checksum. No genuine respondent records are supplied.
-- **Final empirical and supervisory judgment:** achieved-design assessment, supported scoring/inference decisions, suitable uncertainty analysis if needed, disclosure review, discussion/conclusions, and submission sign-off. Record decisions under `private/discussion.md` or make approved report-source edits. Software cannot certify validity or acceptance.
+Notebook and setup instructions are included. Target project folder: **Buisness projects** in a new user-created workspace. The pipeline is tested locally; live Databricks execution is not yet verified. No workspace, notebook run, or deployment is claimed without actual access.
 
-## 3. HOW TO COMPLETE AFTER DATA ARRIVES
+## External requirements
 
-1. Review real requirements and the collection protocol. Complete participant information, instrument review/pilot, version/coding decisions, and recruitment justification before main use. Supplying a file does not retrospectively establish those activities.
-2. Preserve the original export unchanged. Map a reviewed copy to Appendix B's required columns and categories. JSON metadata must be text; timestamps need timezones. Keep pilot/test records separate. Log corrections and legitimate eligibility resolutions; never guess answers.
-3. If useful, create a header-only template with `python research_pipeline.py --template private/responses.csv`; this creates no response rows and refuses to overwrite an existing file. Add only genuine coded records.
-4. Compute the actual digest with `python -c "from research_pipeline import checksum; print(checksum('private/responses.csv'))"`. Create `private/study.json` with `evidence_kind: "real"`, truthful `provenance`, and that `input_sha256`. Initially use `supported_domains: []` and `independent_unit_inference: false`. Enable domains/inference only with actual assessment and the required `measurement_support_note`/`independence_note`; these declarations alone prove nothing.
-5. Run the existing commands:
+Institutional acceptance of secondary data, required student/institution details, declarations, signatures, formatting, and final supervisor review. No genuine primary data are needed for the current descriptive outputs. Chennai conclusions or respondent-level inference would require a separately designed study and appropriate data.
 
-   ```sh
-   python research_pipeline.py --input private/responses.csv --manifest private/study.json --out private/analysis
-   python build_report.py --input private/responses.csv --manifest private/study.json --output private/MBA_Project_Report.html
-   ```
-
-6. Review `audit.json`, `cleaned.json`, and `analysis.json` against the original export and protocol. Chapter 4 then contains computed Tables 4.1–4.2 and Figure 4.1. Distributions, missing reasons, and alpha diagnostics are in the private analysis file. Contextual/recruitment tables, intervals, sensitivity analyses, and cluster methods are not generated automatically; adopt only justified, separately validated procedures.
-7. Review small cells/open text before sharing. Write the final empirical abstract, question-by-question discussion, bounded recommendations, and conclusions from actual findings. Update completed procedures and protocol deviations in Chapter 3. Apply the institution's real format and obtain the required review. The current design discussion is not an empirical conclusion.
-8. Run `python -m unittest discover -s tests -v` and rebuild the report. Preserve private inputs and outputs locally; commit only reviewed non-sensitive source/code changes. Record the software versions, code revision, and input/manifest hashes in the study log for reproducibility.
+Run `python build_report.py` to regenerate the current report, explainer, and ZIP. Run `python -m unittest discover -s tests -v` for the active secondary-analysis checks. Source integrity errors stop the build rather than silently changing the evidence. Use `git rev-parse HEAD` to identify the code revision; generated PDF timestamps are not a fixed content identifier.

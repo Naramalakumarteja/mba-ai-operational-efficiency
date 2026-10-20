@@ -32,3 +32,9 @@ __pycache__/
 Thumbs.db
 # Rebuildable presentation output
 outputs/*.html
+
+# Current public aggregate analysis outputs are reproducible and reviewed.
+!outputs/Project_Complete_Explainer.html
+# Local Databricks credentials/config never belong in Git.
+.databrickscfg
+.databricks/
