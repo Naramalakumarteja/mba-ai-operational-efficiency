@@ -5,6 +5,7 @@ import csv
 import html
 import json
 import zipfile
+import base64
 from copy import deepcopy
 from docx import Document
 from docx.shared import Inches, Pt, RGBColor
@@ -92,6 +93,13 @@ def build(root, template):
 
     doc.add_paragraph(TITLE,'Title');doc.add_paragraph(SUBTITLE,'Subtitle')
     body.append('<h1>'+TITLE+'</h1><p>'+SUBTITLE+'</p>')
+    logo=root/'assets/VIT_logo.jpg'
+    if logo.is_file():
+        p=doc.add_paragraph()
+        p.alignment=WD_ALIGN_PARAGRAPH.CENTER
+        p.add_run().add_picture(str(logo),width=Inches(2.9))
+        encoded=base64.b64encode(logo.read_bytes()).decode('ascii')
+        body.append('<p style="text-align:center"><img alt="VIT Vellore Institute of Technology" style="width:290px;max-width:100%;height:auto" src="data:image/jpeg;base64,'+encoded+'"></p>')
     for text in ['A PROJECT REPORT','Master of Business Administration Online MBA',
                  'Submitted by Eesha Sai Sri Y','Register Number 24MBA7051',
                  'Guide named in supplied draft Suraj P G','VIT Online Learning Program',

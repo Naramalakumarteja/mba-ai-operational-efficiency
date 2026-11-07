@@ -32,6 +32,8 @@ def package_release(root=ROOT):
               if (root/name).is_file()]
     if (root/'outputs/stackoverflow2025').is_dir():
         folders += ('outputs/stackoverflow2025',)
+    if (root/'assets').is_dir():
+        folders += ('assets',)
     with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as archive:
         for name in files:
             archive.write(root/name,name)
