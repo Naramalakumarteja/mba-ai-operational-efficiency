@@ -115,9 +115,37 @@ class SecondaryProjectTests(unittest.TestCase):
         with zipfile.ZipFile(self.archive) as archive:
             self.assertIsNone(archive.testzip())
             for name in ('Databricks_OECD_Analysis.py','research_pipeline.py','README.md','requirements.txt',
-                         'outputs/Project_Complete_Explainer.html','sources/OECD_published_tables.xlsx'):
+                         'outputs/Project_Complete_Explainer.html','outputs/AI_Comparison_Dashboard.html',
+                         'sources/OECD_published_tables.xlsx'):
                 self.assertEqual(archive.read(name),(self.root/name).read_bytes())
             self.assertFalse(any(name.startswith(('archive/','private/','work/')) for name in archive.namelist()))
+
+    def test_dashboard_populations_calculations_and_links(self):
+        from scripts.build_dashboard import dashboard_data
+        data=dashboard_data(self.root)
+        self.assertEqual(len(data),20)
+        productivity=next(row for row in data if row['metric']=='Employer perceived productivity: positive')
+        self.assertEqual(productivity['population'],'AI-adopting employers')
+        self.assertEqual(productivity['finance'],56.7)
+        self.assertEqual({row['unweighted_source_subgroup_n'] for row in productivity['evidence']},{291,452})
+        sizes=[row for row in data if row['topic']=='Adoption by firm size']
+        self.assertEqual(len(sizes),4)
+        self.assertTrue(all(row['population']=='Employers in this firm-size band' for row in sizes))
+        self.assertFalse(any(row['metric']=='Staff-cost motivation' for row in data))
+        page=(self.root/'outputs/AI_Comparison_Dashboard.html').read_text(encoding='utf-8')
+        check=HTMLCheck();check.feed(page)
+        self.assertEqual(len(check.ids),len(set(check.ids)))
+        self.assertIn('Source subgroup n',page)
+        self.assertIn('94%',page)
+
+    def test_dashboard_rejects_changed_summary(self):
+        from scripts.build_dashboard import dashboard_data
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            shutil.copytree(self.root/'results',root/'results')
+            path=root/'results/sector_comparisons.csv'
+            path.write_text(path.read_text().replace('56.7,62.6','50.0,62.6'))
+            with self.assertRaisesRegex(ValueError,'disagrees'):dashboard_data(root)
 
     def test_notebook_uses_shared_pipeline(self):
         source=(self.root/'Databricks_OECD_Analysis.py').read_text()

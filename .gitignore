@@ -35,6 +35,7 @@ outputs/*.html
 
 # Current public aggregate analysis outputs are reproducible and reviewed.
 !outputs/Project_Complete_Explainer.html
+!outputs/AI_Comparison_Dashboard.html
 # Local Databricks credentials/config never belong in Git.
 .databrickscfg
 .databricks/
