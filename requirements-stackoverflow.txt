@@ -3,3 +3,4 @@ pandas==3.0.1
 scipy==1.18.1
 statsmodels==0.15.0
 python-docx==1.2.0
+matplotlib==3.11.2

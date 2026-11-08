@@ -24,6 +24,7 @@ CONTRASTS = {'M1_adoption':'20+ versus under 5 years of experience',
              'M4_complex_tasks':'Daily versus monthly/infrequent AI-tool use',
              'M5_trust':'Daily versus monthly/infrequent AI-tool use'}
 REFS = [
+('Lane, M., Williams, M., and Broecke, S. (2023). The impact of AI on the workplace: Main findings from the OECD AI surveys of employers and workers. OECD Social, Employment and Migration Working Papers No. 288. Source of the earlier contextual comparisons and supplementary workbook.', 'https://doi.org/10.1787/ea0a0fe1-en'),
 ('Stack Overflow. (2025). Developer Survey 2025 methodology.', 'https://survey.stackoverflow.co/2025/methodology'),
 ('Stack Overflow. (2025). Developer Survey 2025 AI results and question wording.', 'https://survey.stackoverflow.co/2025/ai'),
 ('Stack Exchange. (2025). Survey archive results.csv schema.csv and survey.pdf. Public archive accessed 7 November 2026; local CSV obtained 2 November 2026 and verified by SHA-256.', 'https://github.com/StackExchange/Survey/tree/main/packages/archive/2025'),
@@ -39,6 +40,10 @@ def pvalue(p):
 
 def build(root, template):
     out=root/'outputs/stackoverflow2025'
+    import importlib.util
+    spec=importlib.util.spec_from_file_location('research_figures',root/'scripts/build_research_figures.py')
+    figures_module=importlib.util.module_from_spec(spec);spec.loader.exec_module(figures_module)
+    figures_module.build(root)
     analysis=json.loads((out/'analysis.json').read_text(encoding='utf-8'))
     audit=analysis['audit']; models=analysis['models']; sensitivity=analysis['sensitivity']
     source=Document(template)
@@ -70,6 +75,12 @@ def build(root, template):
         body.append(f'<h{level+1} id="{anchor}">{html.escape(text)}</h{level+1}>')
     def page():
         doc.add_page_break()
+    def chart(filename,caption):
+        path=out/'figures'/filename
+        doc.add_picture(str(path),width=Inches(6.5))
+        doc.add_paragraph(caption,'Caption')
+        encoded=base64.b64encode(path.read_bytes()).decode('ascii')
+        body.append('<figure><img style="width:100%;height:auto" alt="'+html.escape(caption,quote=True)+'" src="data:image/png;base64,'+encoded+'"><figcaption>'+html.escape(caption)+'</figcaption></figure>')
     def repository_link():
         p=doc.add_paragraph('Public VIT project repository: ')
         link=OxmlElement('w:hyperlink')
@@ -101,6 +112,7 @@ def build(root, template):
                     sh=OxmlElement('w:shd');sh.set(qn('w:fill'),'DDE6EF' if i==0 else 'F5F5F5');tcpr.append(sh)
                 for p in cell.paragraphs:
                     p.paragraph_format.space_after=Pt(4);p.paragraph_format.space_before=Pt(4)
+                    p.paragraph_format.keep_with_next=i < len(t.rows)-1
                     for r in p.runs:r.font.size=Pt(10);r.bold=i==0
         body.append('<div class="table"><table><thead><tr>'+''.join('<th>'+html.escape(str(h))+'</th>' for h in headers)+'</tr></thead><tbody>'+''.join('<tr>'+''.join('<td>'+html.escape(str(v))+'</td>' for v in row)+'</tr>' for row in rows)+'</tbody></table></div>')
 
@@ -114,8 +126,8 @@ def build(root, template):
         encoded=base64.b64encode(logo.read_bytes()).decode('ascii')
         body.append('<p style="text-align:center"><img alt="VIT Vellore Institute of Technology" style="width:290px;max-width:100%;height:auto" src="data:image/jpeg;base64,'+encoded+'"></p>')
     for text in ['A PROJECT REPORT','Master of Business Administration Online MBA',
-                 'Submitted by Eesha Sai Sri Y','Register Number 24MBA7051',
-                 'Guide named in supplied draft Suraj P G','VIT Online Learning Program',
+                 'Submitted by [Candidate name]','Register Number [Registration number]',
+                 'Guide: [Supervisor name]','VIT Online Learning Program',
                  'Vellore Institute of Technology','November 2026',
                  'Revised empirical draft for supervisor review']:
         p=doc.add_paragraph(text);p.alignment=WD_ALIGN_PARAGRAPH.CENTER
@@ -127,7 +139,7 @@ def build(root, template):
     para('The supervisor is requested to review the revised dataset, objectives, research design, interpretation and report format. This draft does not certify institutional approval or completed supervision.')
     para('Guide signature ____________________    Date ____________________')
     heading('Acknowledgements',2)
-    para('The project acknowledges Stack Overflow and the survey respondents for the published data and questionnaires. The supplied draft identifies Suraj P G as guide. Naramala Kumar Teja and Keerthana P assisted with the project. Roles and acknowledgements should be confirmed by the candidate and supervisor.')
+    para('The project acknowledges Stack Overflow and the survey respondents for the published data and questionnaires. Candidate, supervisor and contributor acknowledgements should be supplied and confirmed privately before institutional submission.')
     page();heading('Abstract')
     para(f'This Operations Management project examines AI adoption and developers’ reported experiences using public Stack Overflow Developer Survey 2025 microdata. The archive contains {audit["source_rows"]:,} rows, while the publisher reports 49,009 responses in its published analysis. The reason for the 182-row difference has not been established; the present analysis documents its own cohort and does not claim exact reproduction of the published figures. The scope is employed professional developers: {audit["employed_professional_cohort"]:,} records before question-specific and covariate exclusions. Five exploratory binary logistic regressions examine adoption, agent-productivity agreement, debugging frustration, complex-task ratings and trust. Models adjust for grouped work experience, organisation size and grouped country; experience is the exposure in the adoption model. Models of user experiences additionally compare usage frequencies. Robust HC1 standard errors and 95% confidence intervals are reported, with Holm correction for five nominated primary contrasts.')
     for m in models[:2]:
@@ -177,10 +189,12 @@ def build(root, template):
     table(['Model','Eligible','Outcome observed','Covariate exclusions','Final n','Outcome = 1'],[
       [m['name'].split('_')[0],f'{m["eligible_n"]:,}',f'{m["outcome_observed_n"]:,}',f'{m["covariate_excluded_n"]:,}',f'{m["n"]:,}',f'{m["events"]:,} ({m["event_percent"]:.1f}%)'] for m in models])
     para('Eligible denominators differ because adoption uses the employed cohort, productivity uses current agent users and the remaining models use current tool users. Outcome-observed counts precede complete-case adjustment. Event percentages above refer only to each final model sample and must not be described as population prevalence. Exclusion counts by covariate are stored in analysis.json and may overlap.')
+    chart('regression_sample_sizes.png','Figure 1. New Stack Overflow analytical samples. These overlapping model samples have different eligibility rules.')
     heading('4.2 Primary adjusted associations',2)
     table(['Model and comparison','Adjusted OR','95% CI','Holm p'],[
         [m['name'].split('_')[0]+' '+CONTRASTS[m['name']],f'{m["primary"]["odds_ratio"]:.2f}',
          f'{m["primary"]["ci_low"]:.2f} to {m["primary"]["ci_high"]:.2f}',pvalue(m['primary']['holm_p_five_primary_tests'])] for m in models])
+    chart('regression_odds_ratios.png','Figure 2. New regression estimates with pointwise 95% confidence intervals. Primary comparisons and adjustment variables are defined in Section 3.3.')
     for m in models:
         r=m['primary'];direction='higher' if r['odds_ratio']>1 else 'lower'
         para(f'{m["name"].split("_")[0]} {LABELS[m["name"]]}: {CONTRASTS[m["name"]]} is associated with {direction} odds of the coded outcome, conditional on the included covariates (OR {r["odds_ratio"]:.2f}; 95% CI {r["ci_low"]:.2f}–{r["ci_high"]:.2f}; n={m["n"]:,}).')
@@ -223,6 +237,17 @@ def build(root, template):
     para('Source archive SHA-256: '+audit['source_sha256'])
     para('Source schema SHA-256: '+audit['schema_sha256'])
     para('Database attribution: Stack Overflow Developer Survey 2025, Stack Exchange. Data licensed under ODbL 1.0; contents under DbCL 1.0 as identified by the publisher. Retain attribution and licence notices when reusing the database or adapted extracts. Public download does not remove applicable licence obligations.')
+    page();heading('E Earlier OECD descriptive outputs')
+    para('The following charts retain the earlier OECD output as contextual evidence. They use published weighted aggregates from 2022 employer and worker surveys, reported by Lane, Williams and Broecke (2023), rather than the Stack Overflow respondent records used in the five regressions. They are not pooled, are not regression estimates, and do not validate the new models. The source covers Austria, Canada, France, Germany, Ireland, the United Kingdom and the United States, in finance and insurance and manufacturing; original overall samples were 2,053 employers and 5,334 workers. Denominators differ by question. No Chennai manager data were collected.')
+    para('Source: Lane, M., Williams, M., and Broecke, S. (2023). The impact of AI on the workplace: Main findings from the OECD AI surveys of employers and workers. OECD Social, Employment and Migration Working Papers No. 288. https://doi.org/10.1787/ea0a0fe1-en . Charts are redrawn from the preserved supplementary workbook through results/sector_comparisons.csv and results/adoption_by_firm_size.csv. Original source SVG charts and tables are included in the combined ZIP.')
+    for i,(filename,caption) in enumerate([
+        ('oecd_adoption.png','Figure 3. Earlier OECD adoption by employer size. Source Figure 2.1; each size band has its own subgroup.'),
+        ('oecd_performance.png','Figure 4. Earlier OECD adoption and perceived performance. All employers, AI-adopting employers and AI-using workers are different populations.'),
+        ('oecd_work.png','Figure 5. Earlier OECD task and work changes. Automation and task creation can overlap; increased pace is not necessarily beneficial.'),
+        ('oecd_decisions.png','Figure 6. Earlier OECD decision assistance and assisted-worker perceptions. Prevalence and agreement use different denominators.'),
+        ('oecd_barriers.png','Figure 7. Earlier OECD barriers. Reported barriers can overlap and are not monetary cost or return-on-investment measurements.')]):
+        if i in [1,3]:page()
+        chart(filename,caption)
     dest=out/'AI_Use_at_Work_Regression_Report.docx';doc.save(dest)
     contents=''.join(body)
     navigation='<nav>'+''.join('<a href="#section-'+str(i)+'">'+html.escape(part.split('>',1)[1].split('</',1)[0])+'</a> ' for i,part in enumerate(body) if part.startswith('<h2 '))+'</nav>'
@@ -230,6 +255,8 @@ def build(root, template):
     (out/'README.md').write_text('''# Stack Overflow regression analysis
 
 Public VIT project repository: https://github.com/saisri132000/mba-ai-operational-efficiency
+
+The revised report includes seven charts: five earlier OECD descriptive comparisons in a separate appendix, plus new regression odds ratios and sample sizes. The original SVG outputs remain under figures/ at the repository root. The combined package contains both sets without pooling their data.
 
 This is an independent revised research report using genuine public respondent data. It does not replace or pool the existing OECD aggregate report.
 

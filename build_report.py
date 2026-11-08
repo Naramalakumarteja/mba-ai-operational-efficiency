@@ -30,6 +30,8 @@ def package_release(root=ROOT):
              'outputs/AI_Comparison_Dashboard.html']
     files += [name for name in ('stackoverflow_analysis.py','requirements-stackoverflow.txt')
               if (root/name).is_file()]
+    files += [name for name in ('outputs/AI_Use_at_Work_Updated_Review.pptx',)
+              if (root/name).is_file()]
     if (root/'outputs/stackoverflow2025').is_dir():
         folders += ('outputs/stackoverflow2025',)
     if (root/'assets').is_dir():
