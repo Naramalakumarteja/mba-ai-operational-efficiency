@@ -1,0 +1,68 @@
+{
+  "name": "M2_productivity",
+  "status": "completed",
+  "model": "M2_productivity",
+  "description": "AI-adopting employer reports increased productivity",
+  "flow": {
+    "final_n": 687,
+    "events": 413,
+    "nonevents": 274
+  },
+  "categories_and_reference": {
+    "lengthai": {
+      "reference": "0-2 years",
+      "levels": [
+        "0-2 years",
+        "Over 2 to 5 years",
+        "Over 5 years"
+      ]
+    },
+    "country": {
+      "reference": "1",
+      "levels": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ]
+    },
+    "industry1": {
+      "reference": "1",
+      "levels": [
+        "1",
+        "2"
+      ]
+    },
+    "size1": {
+      "reference": "2",
+      "levels": [
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    }
+  },
+  "parameters": 13,
+  "events_per_parameter": 21.076923076923077,
+  "converged": true,
+  "in_sample": {
+    "auc": 0.5873570633251445,
+    "brier": 0.23241519370960909,
+    "log_loss": 0.6560277297910292
+  },
+  "holdout": {
+    "auc": 0.5799915576192487,
+    "brier": 0.23461731275561934,
+    "log_loss": 0.6602916542113892,
+    "n_test": 172
+  },
+  "maximum_vif": 2.2258399097957575,
+  "pseudo_r2_mcfadden": 0.024547291360583312,
+  "covariance": "Independent-observation HC1, not complex-survey-design adjusted",
+  "sampling_weights": "NOT APPLIED: verify OECD technical/codebook documentation and design first",
+  "coding_status": "Outcome codes checked against original Stata labels; eligibility checked against observed routing"
+}

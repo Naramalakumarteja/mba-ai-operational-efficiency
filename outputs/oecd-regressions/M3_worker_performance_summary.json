@@ -1,0 +1,65 @@
+{
+  "name": "M3_worker_performance",
+  "status": "completed",
+  "model": "M3_worker_performance",
+  "description": "AI-using worker reports improved own performance",
+  "flow": {
+    "final_n": 1987,
+    "events": 1655,
+    "nonevents": 332
+  },
+  "categories_and_reference": {
+    "training": {
+      "reference": "1",
+      "levels": [
+        "1",
+        "2"
+      ]
+    },
+    "education": {
+      "reference": "1",
+      "levels": [
+        "1",
+        "2"
+      ]
+    },
+    "sector": {
+      "reference": "1",
+      "levels": [
+        "1",
+        "2"
+      ]
+    },
+    "country": {
+      "reference": "1",
+      "levels": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ]
+    }
+  },
+  "parameters": 14,
+  "events_per_parameter": 23.714285714285715,
+  "converged": true,
+  "in_sample": {
+    "auc": 0.6925353983911477,
+    "brier": 0.12965829921008637,
+    "log_loss": 0.4188108251499252
+  },
+  "holdout": {
+    "auc": 0.681988824864676,
+    "brier": 0.13041572439213772,
+    "log_loss": 0.4221276760575457,
+    "n_test": 497
+  },
+  "maximum_vif": 2.5236133397108684,
+  "pseudo_r2_mcfadden": 0.07185767294058387,
+  "covariance": "Independent-observation HC1, not complex-survey-design adjusted",
+  "sampling_weights": "NOT APPLIED: verify OECD technical/codebook documentation and design first",
+  "coding_status": "Outcome codes checked against original Stata labels; eligibility checked against observed routing"
+}

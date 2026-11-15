@@ -15,3 +15,5 @@ Models use complete cases, unweighted estimates and independent-observation HC1 
 OECD (2022), Microdata from the OECD AI surveys of employers and workers. Available via: https://www.oecd.org/future-of-work/reports-and-data/data-infographics.htm
 
 Results and their interpretation are the sole responsibility of the author(s). The opinions expressed and arguments employed herein do not necessarily reflect the official views of the OECD or its Member countries.
+
+[View regression tables, plots and diagnostics](oecd-regressions/README.md).

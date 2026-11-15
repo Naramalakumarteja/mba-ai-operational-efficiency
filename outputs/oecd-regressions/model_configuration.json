@@ -1,0 +1,140 @@
+{
+  "models": {
+    "M1_adoption": {
+      "dataset": "employer",
+      "population_filter": null,
+      "outcome": "adoption",
+      "positive": [
+        1
+      ],
+      "negative": [
+        2
+      ],
+      "predictors": [
+        "country",
+        "industry1",
+        "size1"
+      ],
+      "description": "Employer reports adopting AI"
+    },
+    "M2_productivity": {
+      "dataset": "employer",
+      "population_filter": {
+        "column": "adoption",
+        "values": [
+          1
+        ]
+      },
+      "outcome": "productivity",
+      "positive": [
+        1
+      ],
+      "negative": [
+        2,
+        3
+      ],
+      "predictors": [
+        "lengthai",
+        "country",
+        "industry1",
+        "size1"
+      ],
+      "description": "AI-adopting employer reports increased productivity"
+    },
+    "M3_worker_performance": {
+      "dataset": "worker",
+      "population_filter": {
+        "column": "aiuser",
+        "values": [
+          1
+        ]
+      },
+      "outcome": "impactperformanceuser",
+      "positive": [
+        1,
+        2
+      ],
+      "negative": [
+        3,
+        4,
+        5
+      ],
+      "predictors": [
+        "training",
+        "employeeagecat2",
+        "education",
+        "sector",
+        "country"
+      ],
+      "description": "AI-using worker reports improved own performance"
+    },
+    "M4_decision_assistance": {
+      "dataset": "worker",
+      "population_filter": {
+        "column": "aiuser",
+        "values": [
+          1
+        ]
+      },
+      "outcome": "helpdecisionsuser",
+      "positive": [
+        1
+      ],
+      "negative": [
+        2
+      ],
+      "predictors": [
+        "training",
+        "employeerole",
+        "employeetenure",
+        "sector",
+        "country"
+      ],
+      "description": "AI-using worker reports receiving decision assistance"
+    },
+    "M5_cost_barrier": {
+      "dataset": "employer",
+      "population_filter": null,
+      "outcome": "barriers_1",
+      "positive": [
+        1
+      ],
+      "negative": [
+        2
+      ],
+      "predictors": [
+        "country",
+        "industry1",
+        "size1"
+      ],
+      "description": "Employer reports high cost as an AI implementation barrier"
+    }
+  },
+  "predictor_invalid_codes": {
+    "country": [],
+    "industry1": [],
+    "size1": [],
+    "lengthai": [
+      99
+    ],
+    "training": [
+      8
+    ],
+    "employeeagecat2": [
+      9
+    ],
+    "education": [
+      9
+    ],
+    "sector": [
+      3
+    ],
+    "employeerole": [
+      10
+    ],
+    "employeetenure": [
+      92,
+      99
+    ]
+  }
+}

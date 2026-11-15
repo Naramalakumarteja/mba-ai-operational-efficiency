@@ -1,0 +1,60 @@
+{
+  "name": "M5_cost_barrier",
+  "status": "completed",
+  "model": "M5_cost_barrier",
+  "description": "Employer reports high cost as an AI implementation barrier",
+  "flow": {
+    "final_n": 1920,
+    "events": 1128,
+    "nonevents": 792
+  },
+  "categories_and_reference": {
+    "country": {
+      "reference": "1",
+      "levels": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ]
+    },
+    "industry1": {
+      "reference": "1",
+      "levels": [
+        "1",
+        "2"
+      ]
+    },
+    "size1": {
+      "reference": "2",
+      "levels": [
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    }
+  },
+  "parameters": 11,
+  "events_per_parameter": 72.0,
+  "converged": true,
+  "in_sample": {
+    "auc": 0.5480542347231177,
+    "brier": 0.2407163986552865,
+    "log_loss": 0.6743976873161136
+  },
+  "holdout": {
+    "auc": 0.5307149509277169,
+    "brier": 0.24232811662275947,
+    "log_loss": 0.6776881373903388,
+    "n_test": 480
+  },
+  "maximum_vif": 1.8008448626922746,
+  "pseudo_r2_mcfadden": 0.004954385471788614,
+  "covariance": "Independent-observation HC1, not complex-survey-design adjusted",
+  "sampling_weights": "NOT APPLIED: verify OECD technical/codebook documentation and design first",
+  "coding_status": "Outcome codes checked against original Stata labels; eligibility checked against observed routing"
+}

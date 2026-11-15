@@ -1,0 +1,60 @@
+{
+  "name": "M1_adoption",
+  "status": "completed",
+  "model": "M1_adoption",
+  "description": "Employer reports adopting AI",
+  "flow": {
+    "final_n": 1991,
+    "events": 743,
+    "nonevents": 1248
+  },
+  "categories_and_reference": {
+    "country": {
+      "reference": "1",
+      "levels": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ]
+    },
+    "industry1": {
+      "reference": "1",
+      "levels": [
+        "1",
+        "2"
+      ]
+    },
+    "size1": {
+      "reference": "2",
+      "levels": [
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    }
+  },
+  "parameters": 11,
+  "events_per_parameter": 67.54545454545455,
+  "converged": true,
+  "in_sample": {
+    "auc": 0.6259522638644442,
+    "brier": 0.22371272613619456,
+    "log_loss": 0.6389518884849377
+  },
+  "holdout": {
+    "auc": 0.6094396195202647,
+    "brier": 0.22618020667401054,
+    "log_loss": 0.6447021255521616,
+    "n_test": 498
+  },
+  "maximum_vif": 1.7512295915014364,
+  "pseudo_r2_mcfadden": 0.03280859834961525,
+  "covariance": "Independent-observation HC1, not complex-survey-design adjusted",
+  "sampling_weights": "NOT APPLIED: verify OECD technical/codebook documentation and design first",
+  "coding_status": "Outcome codes checked against original Stata labels; eligibility checked against observed routing"
+}

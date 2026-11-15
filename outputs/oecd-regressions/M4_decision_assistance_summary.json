@@ -1,0 +1,66 @@
+{
+  "name": "M4_decision_assistance",
+  "status": "completed",
+  "model": "M4_decision_assistance",
+  "description": "AI-using worker reports receiving decision assistance",
+  "flow": {
+    "final_n": 1974,
+    "events": 1374,
+    "nonevents": 600
+  },
+  "categories_and_reference": {
+    "training": {
+      "reference": "1",
+      "levels": [
+        "1",
+        "2"
+      ]
+    },
+    "employeetenure": {
+      "reference": "0-4 years",
+      "levels": [
+        "0-4 years",
+        "10+ years",
+        "5-9 years"
+      ]
+    },
+    "sector": {
+      "reference": "1",
+      "levels": [
+        "1",
+        "2"
+      ]
+    },
+    "country": {
+      "reference": "1",
+      "levels": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ]
+    }
+  },
+  "parameters": 19,
+  "events_per_parameter": 31.57894736842105,
+  "converged": true,
+  "in_sample": {
+    "auc": 0.6937427219796216,
+    "brier": 0.19026296019775507,
+    "log_loss": 0.563321134090421
+  },
+  "holdout": {
+    "auc": 0.6638468992248061,
+    "brier": 0.20028840077006071,
+    "log_loss": 0.5850138526273108,
+    "n_test": 494
+  },
+  "maximum_vif": 2.441421267315377,
+  "pseudo_r2_mcfadden": 0.08280059321385913,
+  "covariance": "Independent-observation HC1, not complex-survey-design adjusted",
+  "sampling_weights": "NOT APPLIED: verify OECD technical/codebook documentation and design first",
+  "coding_status": "Outcome codes checked against original Stata labels; eligibility checked against observed routing"
+}

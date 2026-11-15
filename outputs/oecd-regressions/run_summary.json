@@ -1,0 +1,321 @@
+[
+  {
+    "name": "M1_adoption",
+    "status": "completed",
+    "model": "M1_adoption",
+    "description": "Employer reports adopting AI",
+    "flow": {
+      "final_n": 1991,
+      "events": 743,
+      "nonevents": 1248
+    },
+    "categories_and_reference": {
+      "country": {
+        "reference": "1",
+        "levels": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7"
+        ]
+      },
+      "industry1": {
+        "reference": "1",
+        "levels": [
+          "1",
+          "2"
+        ]
+      },
+      "size1": {
+        "reference": "2",
+        "levels": [
+          "2",
+          "3",
+          "4",
+          "5"
+        ]
+      }
+    },
+    "parameters": 11,
+    "events_per_parameter": 67.54545454545455,
+    "converged": true,
+    "in_sample": {
+      "auc": 0.6259522638644442,
+      "brier": 0.22371272613619456,
+      "log_loss": 0.6389518884849377
+    },
+    "holdout": {
+      "auc": 0.6094396195202647,
+      "brier": 0.22618020667401054,
+      "log_loss": 0.6447021255521616,
+      "n_test": 498
+    },
+    "maximum_vif": 1.7512295915014364,
+    "pseudo_r2_mcfadden": 0.03280859834961525,
+    "covariance": "Independent-observation HC1, not complex-survey-design adjusted",
+    "sampling_weights": "NOT APPLIED: verify OECD technical/codebook documentation and design first",
+    "coding_status": "Outcome codes checked against original Stata labels; eligibility checked against observed routing"
+  },
+  {
+    "name": "M2_productivity",
+    "status": "completed",
+    "model": "M2_productivity",
+    "description": "AI-adopting employer reports increased productivity",
+    "flow": {
+      "final_n": 687,
+      "events": 413,
+      "nonevents": 274
+    },
+    "categories_and_reference": {
+      "lengthai": {
+        "reference": "0-2 years",
+        "levels": [
+          "0-2 years",
+          "Over 2 to 5 years",
+          "Over 5 years"
+        ]
+      },
+      "country": {
+        "reference": "1",
+        "levels": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7"
+        ]
+      },
+      "industry1": {
+        "reference": "1",
+        "levels": [
+          "1",
+          "2"
+        ]
+      },
+      "size1": {
+        "reference": "2",
+        "levels": [
+          "2",
+          "3",
+          "4",
+          "5"
+        ]
+      }
+    },
+    "parameters": 13,
+    "events_per_parameter": 21.076923076923077,
+    "converged": true,
+    "in_sample": {
+      "auc": 0.5873570633251445,
+      "brier": 0.23241519370960909,
+      "log_loss": 0.6560277297910292
+    },
+    "holdout": {
+      "auc": 0.5799915576192487,
+      "brier": 0.23461731275561934,
+      "log_loss": 0.6602916542113892,
+      "n_test": 172
+    },
+    "maximum_vif": 2.2258399097957575,
+    "pseudo_r2_mcfadden": 0.024547291360583312,
+    "covariance": "Independent-observation HC1, not complex-survey-design adjusted",
+    "sampling_weights": "NOT APPLIED: verify OECD technical/codebook documentation and design first",
+    "coding_status": "Outcome codes checked against original Stata labels; eligibility checked against observed routing"
+  },
+  {
+    "name": "M3_worker_performance",
+    "status": "completed",
+    "model": "M3_worker_performance",
+    "description": "AI-using worker reports improved own performance",
+    "flow": {
+      "final_n": 1987,
+      "events": 1655,
+      "nonevents": 332
+    },
+    "categories_and_reference": {
+      "training": {
+        "reference": "1",
+        "levels": [
+          "1",
+          "2"
+        ]
+      },
+      "education": {
+        "reference": "1",
+        "levels": [
+          "1",
+          "2"
+        ]
+      },
+      "sector": {
+        "reference": "1",
+        "levels": [
+          "1",
+          "2"
+        ]
+      },
+      "country": {
+        "reference": "1",
+        "levels": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7"
+        ]
+      }
+    },
+    "parameters": 14,
+    "events_per_parameter": 23.714285714285715,
+    "converged": true,
+    "in_sample": {
+      "auc": 0.6925353983911477,
+      "brier": 0.12965829921008637,
+      "log_loss": 0.4188108251499252
+    },
+    "holdout": {
+      "auc": 0.681988824864676,
+      "brier": 0.13041572439213772,
+      "log_loss": 0.4221276760575457,
+      "n_test": 497
+    },
+    "maximum_vif": 2.5236133397108684,
+    "pseudo_r2_mcfadden": 0.07185767294058387,
+    "covariance": "Independent-observation HC1, not complex-survey-design adjusted",
+    "sampling_weights": "NOT APPLIED: verify OECD technical/codebook documentation and design first",
+    "coding_status": "Outcome codes checked against original Stata labels; eligibility checked against observed routing"
+  },
+  {
+    "name": "M4_decision_assistance",
+    "status": "completed",
+    "model": "M4_decision_assistance",
+    "description": "AI-using worker reports receiving decision assistance",
+    "flow": {
+      "final_n": 1974,
+      "events": 1374,
+      "nonevents": 600
+    },
+    "categories_and_reference": {
+      "training": {
+        "reference": "1",
+        "levels": [
+          "1",
+          "2"
+        ]
+      },
+      "employeetenure": {
+        "reference": "0-4 years",
+        "levels": [
+          "0-4 years",
+          "10+ years",
+          "5-9 years"
+        ]
+      },
+      "sector": {
+        "reference": "1",
+        "levels": [
+          "1",
+          "2"
+        ]
+      },
+      "country": {
+        "reference": "1",
+        "levels": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7"
+        ]
+      }
+    },
+    "parameters": 19,
+    "events_per_parameter": 31.57894736842105,
+    "converged": true,
+    "in_sample": {
+      "auc": 0.6937427219796216,
+      "brier": 0.19026296019775507,
+      "log_loss": 0.563321134090421
+    },
+    "holdout": {
+      "auc": 0.6638468992248061,
+      "brier": 0.20028840077006071,
+      "log_loss": 0.5850138526273108,
+      "n_test": 494
+    },
+    "maximum_vif": 2.441421267315377,
+    "pseudo_r2_mcfadden": 0.08280059321385913,
+    "covariance": "Independent-observation HC1, not complex-survey-design adjusted",
+    "sampling_weights": "NOT APPLIED: verify OECD technical/codebook documentation and design first",
+    "coding_status": "Outcome codes checked against original Stata labels; eligibility checked against observed routing"
+  },
+  {
+    "name": "M5_cost_barrier",
+    "status": "completed",
+    "model": "M5_cost_barrier",
+    "description": "Employer reports high cost as an AI implementation barrier",
+    "flow": {
+      "final_n": 1920,
+      "events": 1128,
+      "nonevents": 792
+    },
+    "categories_and_reference": {
+      "country": {
+        "reference": "1",
+        "levels": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7"
+        ]
+      },
+      "industry1": {
+        "reference": "1",
+        "levels": [
+          "1",
+          "2"
+        ]
+      },
+      "size1": {
+        "reference": "2",
+        "levels": [
+          "2",
+          "3",
+          "4",
+          "5"
+        ]
+      }
+    },
+    "parameters": 11,
+    "events_per_parameter": 72.0,
+    "converged": true,
+    "in_sample": {
+      "auc": 0.5480542347231177,
+      "brier": 0.2407163986552865,
+      "log_loss": 0.6743976873161136
+    },
+    "holdout": {
+      "auc": 0.5307149509277169,
+      "brier": 0.24232811662275947,
+      "log_loss": 0.6776881373903388,
+      "n_test": 480
+    },
+    "maximum_vif": 1.8008448626922746,
+    "pseudo_r2_mcfadden": 0.004954385471788614,
+    "covariance": "Independent-observation HC1, not complex-survey-design adjusted",
+    "sampling_weights": "NOT APPLIED: verify OECD technical/codebook documentation and design first",
+    "coding_status": "Outcome codes checked against original Stata labels; eligibility checked against observed routing"
+  }
+]
